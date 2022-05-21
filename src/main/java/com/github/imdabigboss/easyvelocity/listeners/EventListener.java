@@ -5,6 +5,7 @@ import com.github.imdabigboss.easyvelocity.info.PluginInfo;
 import com.github.imdabigboss.easyvelocity.info.ServerInfo;
 import com.github.imdabigboss.easyvelocity.managers.MaintenanceManager;
 import com.github.imdabigboss.easyvelocity.utils.ChatColor;
+import com.github.imdabigboss.easyvelocity.utils.PluginConfig;
 import com.github.imdabigboss.easyvelocity.utils.ServerUtils;
 import com.github.imdabigboss.easyvelocity.utils.Utils;
 import com.velocitypowered.api.command.CommandSource;
@@ -15,6 +16,7 @@ import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
+import com.velocitypowered.api.event.player.GameProfileRequestEvent;
 import com.velocitypowered.api.event.player.KickedFromServerEvent;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
 import com.velocitypowered.api.event.player.ServerPreConnectEvent;
@@ -25,6 +27,7 @@ import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerPing;
 import com.velocitypowered.api.util.Favicon;
+import com.velocitypowered.api.util.GameProfile;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 
@@ -32,10 +35,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class EventListener {
     private final List<String> justJoined = new ArrayList<>();
@@ -105,19 +105,25 @@ public class EventListener {
 
     @Subscribe(order = PostOrder.FIRST)
     public void onLoginEvent(LoginEvent event) {
-        if (EasyVelocity.getMaintenanceManager().isMaintenance()) {
-            if (!EasyVelocity.getMaintenanceManager().canPlayerBypass(event.getPlayer().getUniqueId())) {
-                event.setResult(ResultedEvent.ComponentResult.denied(MaintenanceManager.getMaintenanceMessage(event.getPlayer().getUsername())));
+        UUID originalPlayerUUID = EasyVelocity.getNickManager().getOriginalPlayer(event.getPlayer().getUniqueId());
+        if (originalPlayerUUID == null) {
+            if (EasyVelocity.getMaintenanceManager().isMaintenance()) {
+                if (!EasyVelocity.getMaintenanceManager().canPlayerBypass(event.getPlayer().getUniqueId())) {
+                    event.setResult(ResultedEvent.ComponentResult.denied(MaintenanceManager.getMaintenanceMessage(event.getPlayer().getUsername())));
+                }
             }
-        }
 
-        if (!EasyVelocity.getWhitelistManager().isWhitelisted(event.getPlayer().getUniqueId())) {
-            event.setResult(ResultedEvent.ComponentResult.denied(Component.text(ChatColor.RED + "We are very sorry " + event.getPlayer().getUsername() + ", but you are not whitelisted on this server!")));
-        }
+            if (!EasyVelocity.getWhitelistManager().isWhitelisted(event.getPlayer().getUniqueId())) {
+                event.setResult(ResultedEvent.ComponentResult.denied(Component.text(ChatColor.RED + "We are very sorry " + event.getPlayer().getUsername() + ", but you are not whitelisted on this server!")));
+            }
 
-        String banMessage = EasyVelocity.getBanManager().getPlayerBanMessage(event.getPlayer().getUniqueId());
-        if (banMessage != null) {
-            event.setResult(ResultedEvent.ComponentResult.denied(Component.text(banMessage)));
+            String banMessage = EasyVelocity.getBanManager().getPlayerBanMessage(event.getPlayer().getUniqueId());
+            if (banMessage != null) {
+                event.setResult(ResultedEvent.ComponentResult.denied(Component.text(banMessage)));
+            }
+        } else {
+            EasyVelocity.getLogger().info("Player " + event.getPlayer().getUsername() + " has logged in as a nick from " + EasyVelocity.getUUIDManager().getPlayerName(originalPlayerUUID) + ".");
+            event.getPlayer().sendMessage(Component.text(ChatColor.RED + "You have logged in as a nick! Beware!"));
         }
 
         new Thread(() -> {
@@ -195,6 +201,21 @@ public class EventListener {
                 EasyVelocity.getLogger().info("Redirecting " + event.getPlayer().getUsername() + " to lobby, because of kick.");
 
                 event.setResult(KickedFromServerEvent.RedirectPlayer.create(lobby.get()));
+            }
+        }
+    }
+
+    @Subscribe
+    public void onGameProfileRequest(GameProfileRequestEvent event) {
+        if (event.isOnlineMode()) {
+            UUID oldUuid = event.getGameProfile().getId();
+            if (oldUuid == null) {
+                return;
+            }
+
+            UUID newUuid = EasyVelocity.getNickManager().getNick(oldUuid);
+            if (newUuid != null) {
+                event.setGameProfile(new GameProfile(newUuid, EasyVelocity.getUUIDManager().getPlayerName(newUuid), Collections.singletonList(new GameProfile.Property("textures", "", ""))));
             }
         }
     }

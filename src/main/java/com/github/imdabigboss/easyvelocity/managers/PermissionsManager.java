@@ -26,8 +26,15 @@ public class PermissionsManager {
         }
 
         Player player = (Player) source;
-        if (this.permissions.containsKey(player.getUniqueId())) {
-            for (String perm : this.permissions.get(player.getUniqueId())) {
+        UUID playerUUID = player.getUniqueId();
+
+        UUID originalPlayerUUID = EasyVelocity.getNickManager().getOriginalPlayer(player.getUniqueId());
+        if (originalPlayerUUID != null) {
+            playerUUID = originalPlayerUUID;
+        }
+
+        if (this.permissions.containsKey(playerUUID)) {
+            for (String perm : this.permissions.get(playerUUID)) {
                 if (perm.equals(permission)) {
                     return true;
                 } else if (perm.equals("*")) {

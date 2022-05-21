@@ -24,6 +24,18 @@ public class UUIDManager {
         }
 
         this.uuidConfig.reload();
+        List<String> playerNames = this.uuidConfig.getKeys(true);
+        for (String forPlayerName : playerNames) {
+            String tmp = forPlayerName + ".";
+            if (tmp.equals(this.bedrock) || tmp.equals(this.java)) {
+                continue;
+            }
+
+            String uuidString = this.uuidConfig.getString(forPlayerName);
+            if (uuidString.equals(uuid.toString())) {
+                this.uuidConfig.set(forPlayerName, null);
+            }
+        }
 
         this.uuidConfig.set(tmpName, uuid.toString());
         this.uuidConfig.save();
@@ -45,8 +57,12 @@ public class UUIDManager {
 
         this.uuidConfig.reload();
         if (this.uuidConfig.contains(tmpName)) {
-            return UUID.fromString(this.uuidConfig.getString(tmpName));
+            String tmp = this.uuidConfig.getString(tmpName);
+            if (tmp != null) {
+                return UUID.fromString(tmp);
+            }
         }
+
 
 
         UUID uuid = UUIDFetcher.getUUID(playerName);

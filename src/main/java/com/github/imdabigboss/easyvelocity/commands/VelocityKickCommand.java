@@ -19,7 +19,7 @@ public class VelocityKickCommand extends EasyVelocityCommand {
     @Override
     public void execute(EasyCommandSender sender, String[] args) {
         if (args.length != 1) {
-            sender.sendMessage(ChatColor.RED + "Usage: /vkick <player>");
+            sender.sendMessage(ChatColor.RED + "Usage: /proxykick <player>");
             return;
         }
 

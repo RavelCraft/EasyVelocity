@@ -32,6 +32,7 @@ public class EasyVelocity {
     private static RanksManager ranksManager = null;
     private static CustomListManger customListManger = null;
     private static BanManager banManager = null;
+    private static NickManager nickManager = null;
 
     @Inject
     public EasyVelocity(ProxyServer serverIN, Logger loggerIN) {
@@ -88,6 +89,7 @@ public class EasyVelocity {
         new WhitelistCommand();
         new MaintenanceCommand();
         new VelocityKickCommand();
+        new VelocityNickCommand();
         new RanksCommand();
         new TempbanCommand();
     }
@@ -101,6 +103,7 @@ public class EasyVelocity {
         ranksManager = new RanksManager();
         customListManger = new CustomListManger();
         banManager = new BanManager();
+        nickManager = new NickManager();
     }
 
     // --- Getters & setters ---
@@ -159,5 +162,9 @@ public class EasyVelocity {
 
     public static BanManager getBanManager() {
         return banManager;
+    }
+
+    public static NickManager getNickManager() {
+        return nickManager;
     }
 }
