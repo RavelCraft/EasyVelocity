@@ -59,7 +59,6 @@ public class EasyVelocity {
         this.registerCommands();
 
         server.getEventManager().register(this, new EventListener());
-        server.getEventManager().register(this, pluginMessageManager);
 
         customListManger.broadcastCustomList();
 
@@ -68,7 +67,7 @@ public class EasyVelocity {
 
     @Subscribe
     public void onShutdown(ProxyShutdownEvent event) {
-        server.getChannelRegistrar().unregister(PluginMessageManager.CHANNEL_ID);
+        pluginMessageManager.unregister();
     }
 
     // --- Util commands ---

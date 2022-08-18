@@ -4,6 +4,7 @@ import com.github.imdabigboss.easyvelocity.EasyVelocity;
 import com.github.imdabigboss.easyvelocity.info.PluginInfo;
 import com.github.imdabigboss.easyvelocity.info.ServerInfo;
 import com.github.imdabigboss.easyvelocity.managers.MaintenanceManager;
+import com.github.imdabigboss.easyvelocity.managers.PluginMessageManager;
 import com.github.imdabigboss.easyvelocity.utils.ChatColor;
 import com.github.imdabigboss.easyvelocity.utils.PluginConfig;
 import com.github.imdabigboss.easyvelocity.utils.ServerUtils;
@@ -16,10 +17,7 @@ import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.event.permission.PermissionsSetupEvent;
-import com.velocitypowered.api.event.player.GameProfileRequestEvent;
-import com.velocitypowered.api.event.player.KickedFromServerEvent;
-import com.velocitypowered.api.event.player.ServerConnectedEvent;
-import com.velocitypowered.api.event.player.ServerPreConnectEvent;
+import com.velocitypowered.api.event.player.*;
 import com.velocitypowered.api.event.proxy.ProxyPingEvent;
 import com.velocitypowered.api.permission.Tristate;
 import com.velocitypowered.api.proxy.Player;
@@ -161,35 +159,35 @@ public class EventListener {
     }
 
     @Subscribe
-    public void onServerConnectedEvent(ServerConnectedEvent event) {
-        String playerName = event.getPlayer().getUsername();
+    public void onServerPostConnectEvent(ServerPostConnectEvent event) {
+        Player player = event.getPlayer();
 
-        EasyVelocity.getPluginMessageManager().sendPlayerCommand(event.getServer(), "dummy", "dummy", "EasyCMD");
+        Optional<ServerConnection> optionalServerConnection = player.getCurrentServer();
+        if (optionalServerConnection.isEmpty()) {
+            return;
+        }
+        RegisteredServer server = optionalServerConnection.get().getServer();
 
-        if (justJoined.contains(playerName)) {
-            justJoined.remove(playerName);
+        if (justJoined.contains(player.getUsername())) {
+            justJoined.remove(player.getUsername());
 
-            EasyVelocity.getPluginMessageManager().sendPlayerCommand(event.getServer(), "sendresourcepack", playerName, "RavelDatapack");
+            EasyVelocity.getPluginMessageManager().sendPlayerCommand(server, player, "sendresourcepack", "", "RavelDatapack");
 
             int out = Utils.getRandomNumberInRange(1, 4);
             if (out == 1) {
-                event.getPlayer().sendMessage(Component.text(ChatColor.AQUA + "Hey there " + playerName + "! Did you read the rules??? Click this message to do so! " + PluginInfo.WEBSITE + "/rules").clickEvent(ClickEvent.openUrl(PluginInfo.WEBSITE + "/rules")));
+                event.getPlayer().sendMessage(Component.text(ChatColor.AQUA + "Hey there " + player.getUsername() + "! Did you read the rules??? Click this message to do so! " + PluginInfo.WEBSITE + "/rules").clickEvent(ClickEvent.openUrl(PluginInfo.WEBSITE + "/rules")));
             }
         }
 
-        EasyVelocity.getCustomListManger().broadcastCustomList(event.getPlayer(), event.getServer(), 1);
+        EasyVelocity.getRanksManager().displayRank(player.getUniqueId());
+        EasyVelocity.getCustomListManger().broadcastCustomList();
     }
 
     @Subscribe
     public void onDisconnectEvent(DisconnectEvent event) {
         ServerUtils.broadcast(ChatColor.YELLOW + event.getPlayer().getUsername() + " has left the network!");
 
-        Optional<ServerConnection> server = event.getPlayer().getCurrentServer();
-        if (server.isPresent()) {
-            EasyVelocity.getCustomListManger().broadcastCustomList(event.getPlayer(), server.get().getServer(), -1);
-        } else {
-            EasyVelocity.getCustomListManger().broadcastCustomList();
-        }
+        EasyVelocity.getCustomListManger().broadcastCustomList();
     }
 
     @Subscribe(order = PostOrder.FIRST)
