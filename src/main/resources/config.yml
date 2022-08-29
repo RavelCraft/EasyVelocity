@@ -1,3 +1,7 @@
 motdMessage: "§eWe hope you enjoy will enjoy the server!"
 
 uuidPath: ""
+
+pathToExportZip: /var/www/html/texturepack.zip
+packURL: https://example.com/texturepack.zip
+packVersion: 0

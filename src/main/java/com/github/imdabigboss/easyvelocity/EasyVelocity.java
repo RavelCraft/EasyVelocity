@@ -5,12 +5,14 @@ import com.github.imdabigboss.easyvelocity.info.PluginInfo;
 import com.github.imdabigboss.easyvelocity.listeners.EventListener;
 import com.github.imdabigboss.easyvelocity.managers.*;
 import com.github.imdabigboss.easyvelocity.utils.PluginConfig;
+import com.github.imdabigboss.easyvelocity.utils.TexturePack;
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
+import org.geysermc.floodgate.api.FloodgateApi;
 import org.slf4j.Logger;
 
 import java.nio.file.Path;
@@ -33,6 +35,8 @@ public class EasyVelocity {
     private static CustomListManger customListManger = null;
     private static BanManager banManager = null;
     private static NickManager nickManager = null;
+
+    private static boolean floodgateAPI = false;
 
     @Inject
     public EasyVelocity(ProxyServer serverIN, Logger loggerIN) {
@@ -60,7 +64,15 @@ public class EasyVelocity {
 
         server.getEventManager().register(this, new EventListener());
 
+        if (server.getPluginManager().getPlugin("floodgate").isPresent()) {
+            if (FloodgateApi.getInstance() != null) {
+                floodgateAPI = true;
+            }
+        }
+
         customListManger.broadcastCustomList();
+
+        TexturePack.init();
 
         logger.info(PluginInfo.NAME + " " + PluginInfo.VERSION + " is enabled!");
     }
@@ -91,6 +103,7 @@ public class EasyVelocity {
         new VelocityNickCommand();
         new RanksCommand();
         new TempbanCommand();
+        new ResourcePackCommand();
     }
 
     private void loadManagers() {
@@ -165,5 +178,9 @@ public class EasyVelocity {
 
     public static NickManager getNickManager() {
         return nickManager;
+    }
+
+    public static boolean isFloodgateAPI() {
+        return floodgateAPI;
     }
 }

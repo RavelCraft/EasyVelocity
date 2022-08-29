@@ -5,10 +5,7 @@ import com.github.imdabigboss.easyvelocity.info.PluginInfo;
 import com.github.imdabigboss.easyvelocity.info.ServerInfo;
 import com.github.imdabigboss.easyvelocity.managers.MaintenanceManager;
 import com.github.imdabigboss.easyvelocity.managers.PluginMessageManager;
-import com.github.imdabigboss.easyvelocity.utils.ChatColor;
-import com.github.imdabigboss.easyvelocity.utils.PluginConfig;
-import com.github.imdabigboss.easyvelocity.utils.ServerUtils;
-import com.github.imdabigboss.easyvelocity.utils.Utils;
+import com.github.imdabigboss.easyvelocity.utils.*;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.ResultedEvent;
@@ -171,7 +168,7 @@ public class EventListener {
         if (justJoined.contains(player.getUsername())) {
             justJoined.remove(player.getUsername());
 
-            EasyVelocity.getPluginMessageManager().sendPlayerCommand(server, player, "sendresourcepack", "", "RavelDatapack");
+            TexturePack.sendTexturePackToPlayer(player);
 
             int out = Utils.getRandomNumberInRange(1, 4);
             if (out == 1) {
