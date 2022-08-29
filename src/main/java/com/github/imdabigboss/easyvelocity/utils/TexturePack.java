@@ -75,7 +75,13 @@ public class TexturePack {
 
         try {
             deleteTempPackFolder();
-            createTempPackFolder();
+
+            createIfNotExists(tmpPackPath);
+            copyPackFile(sourcePackPath.resolve("pack.png"), tmpPackPath.resolve("pack.png"));
+            copyPackFile(sourcePackPath.resolve("pack.mcmeta"), tmpPackPath.resolve("pack.mcmeta"));
+            copyPackFile(sourcePackPath.resolve("LICENSE"), tmpPackPath.resolve("LICENSE"));
+            copyPackFile(sourcePackPath.resolve("assets"), tmpPackPath.resolve("assets"));
+
             ZipUtil.pack(tmpPackPath.toFile(), zip);
         } catch (Exception exception) {
             EasyVelocity.getLogger().error("Unable to export zip file", exception);
@@ -133,15 +139,11 @@ public class TexturePack {
         }
 
         Files.createDirectories(outpath.getParent());
-        Files.copy(path, outpath, StandardCopyOption.REPLACE_EXISTING);
-    }
-
-    private static void createTempPackFolder() throws IOException {
-        createIfNotExists(tmpPackPath);
-        copyPackFile(sourcePackPath.resolve("pack.png"), tmpPackPath.resolve("pack.png"));
-        copyPackFile(sourcePackPath.resolve("pack.mcmeta"), tmpPackPath.resolve("pack.mcmeta"));
-        copyPackFile(sourcePackPath.resolve("LICENSE"), tmpPackPath.resolve("LICENSE"));
-        copyPackFile(sourcePackPath.resolve("assets"), tmpPackPath.resolve("assets"));
+        if (Files.isDirectory(path)) {
+            FileUtils.copyFolder(path, outpath);
+        } else {
+            Files.copy(path, outpath, StandardCopyOption.REPLACE_EXISTING);
+        }
     }
 
     private static void deleteTempPackFolder() {
@@ -163,6 +165,7 @@ public class TexturePack {
         }
 
         ResourcePackInfo packInfo = EasyVelocity.getServer().createResourcePackBuilder(packURL + "?v=" + packVersion)
+                .setPrompt(Component.text("RavelCraft uses a texture pack to add some stuff. We recommend that you use it by clicking \"Yes\"."))
                 .setShouldForce(false)
                 .build();
 
