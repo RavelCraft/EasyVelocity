@@ -5,3 +5,6 @@ uuidPath: ""
 pathToExportZip: /var/www/html/texturepack.zip
 packURL: https://example.com/texturepack.zip
 packVersion: 0
+
+webserver:
+  port: 8080

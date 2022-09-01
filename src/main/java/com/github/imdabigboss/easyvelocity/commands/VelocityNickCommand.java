@@ -7,7 +7,10 @@ import com.github.imdabigboss.easyvelocity.utils.ChatColor;
 import com.velocitypowered.api.proxy.Player;
 import net.kyori.adventure.text.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public class VelocityNickCommand extends EasyVelocityCommand {
     public VelocityNickCommand() {

@@ -6,7 +6,6 @@ import com.github.imdabigboss.easyvelocity.commands.interfaces.EasyVelocityComma
 import com.github.imdabigboss.easyvelocity.utils.ChatColor;
 import com.github.imdabigboss.easyvelocity.utils.TexturePack;
 import com.velocitypowered.api.proxy.Player;
-import com.velocitypowered.api.proxy.server.RegisteredServer;
 
 import java.util.ArrayList;
 import java.util.List;

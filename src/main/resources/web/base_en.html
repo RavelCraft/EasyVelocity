@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>${title} - Ravel Craft</title>
+    <meta name="description" content="${description}">
+    ${header}
+</head>
+<body>
+    ${navbar}
+
+    ${prebody}
+    <div class="text">
+        <div class="alert" id="alertboxen">
+            <span class="closebtn" onclick="this.parentElement.style.display='none';setCookie('en');">&times;</span>
+            <a class="alerttext" href="${path}fr/">Cette page est disponible en Français</a>
+        </div>
+
+        ${body}
+    </div>
+</body>
+</html>

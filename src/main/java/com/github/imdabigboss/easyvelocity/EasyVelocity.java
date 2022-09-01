@@ -6,6 +6,7 @@ import com.github.imdabigboss.easyvelocity.listeners.EventListener;
 import com.github.imdabigboss.easyvelocity.managers.*;
 import com.github.imdabigboss.easyvelocity.utils.PluginConfig;
 import com.github.imdabigboss.easyvelocity.utils.TexturePack;
+import com.github.imdabigboss.easyvelocity.webserver.WebServer;
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
@@ -70,9 +71,11 @@ public class EasyVelocity {
             }
         }
 
+        TexturePack.init();
+
         customListManger.broadcastCustomList();
 
-        TexturePack.init();
+        WebServer.create();
 
         logger.info(PluginInfo.NAME + " " + PluginInfo.VERSION + " is enabled!");
     }
@@ -104,6 +107,7 @@ public class EasyVelocity {
         new RanksCommand();
         new TempbanCommand();
         new ResourcePackCommand();
+        new WebsiteCommand();
     }
 
     private void loadManagers() {

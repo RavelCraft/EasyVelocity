@@ -20,7 +20,9 @@ public abstract class EasyVelocityCommand implements SimpleCommand {
     }
 
     public EasyVelocityCommand(String command, String permission, String... aliases) {
-        if (permission.equals("")) {
+        if (permission == null) {
+            this.permission = null;
+        } else if (permission.isEmpty() || permission.isBlank()) {
             this.permission = null;
         } else {
             this.permission = permission;
