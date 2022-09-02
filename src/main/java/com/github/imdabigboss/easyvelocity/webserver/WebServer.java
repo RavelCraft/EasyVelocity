@@ -2,12 +2,11 @@ package com.github.imdabigboss.easyvelocity.webserver;
 
 import com.github.imdabigboss.easyvelocity.EasyVelocity;
 import com.github.imdabigboss.easyvelocity.info.PluginInfo;
-import com.github.imdabigboss.easyvelocity.utils.FileUtils;
 import com.github.imdabigboss.easyvelocity.utils.Lock;
 import com.github.imdabigboss.easyvelocity.webserver.endpoints.AbstractEndpoint;
-import com.github.imdabigboss.easyvelocity.webserver.endpoints.JarEndpoint;
 import com.github.imdabigboss.easyvelocity.webserver.endpoints.RHTMLEndpoint;
 import com.github.imdabigboss.easyvelocity.webserver.endpoints.RobotsEndpoint;
+import com.github.imdabigboss.easyvelocity.webserver.endpoints.StaticEndpoint;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -24,11 +23,13 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class WebServer implements HttpHandler {
+    public static final Path WEB_DIR = Paths.get("plugins/" + PluginInfo.NAME + "/www").toAbsolutePath();
     private static WebServer instance;
 
     private final HttpServer httpServer;
 
     private final List<AbstractEndpoint> endpoints = new ArrayList<>();
+    private String errorPage = "";
 
     private final int maxServerThreads = 10;
     private final Lock threadLock = new Lock();
@@ -81,15 +82,17 @@ public class WebServer implements HttpHandler {
         endpoints.clear();
 
         endpoints.add(new RobotsEndpoint());
-        endpoints.add(new JarEndpoint(EndpointType.SIMPLE, "/favicon.ico", "web/favicon.ico"));
-        endpoints.add(new JarEndpoint(EndpointType.SIMPLE, "/icon.png", "web/icon.png"));
+        endpoints.add(new StaticEndpoint(EndpointType.SIMPLE, "/favicon.ico"));
+        endpoints.add(new StaticEndpoint(EndpointType.SIMPLE, "/icon.png"));
 
-        endpoints.add(new JarEndpoint(EndpointType.ALL, "/css", "web/css"));
-        endpoints.add(new JarEndpoint(EndpointType.ALL, "/js", "web/js"));
-        endpoints.add(new JarEndpoint(EndpointType.ALL, "/img", "web/img"));
+        endpoints.add(new StaticEndpoint(EndpointType.ALL, "/css"));
+        endpoints.add(new StaticEndpoint(EndpointType.ALL, "/js"));
+        endpoints.add(new StaticEndpoint(EndpointType.ALL, "/img"));
+
+        //Never add /downloads
 
         try {
-            Path markdownRoot = Paths.get("plugins/" + PluginInfo.NAME + "/www");
+            Path markdownRoot = WEB_DIR.resolve("pages");
 
             List<Path> files = Files.walk(markdownRoot)
                     .filter(file -> !Files.isDirectory(file))
@@ -101,6 +104,13 @@ public class WebServer implements HttpHandler {
             }
         } catch (IOException | ParserConfigurationException | SAXException | IllegalStateException e) {
             EasyVelocity.getLogger().error("Error loading web markdown files", e);
+        }
+
+        try {
+            this.errorPage = Files.readString(WEB_DIR.resolve("base/error.html"))
+                    .replace("${header}", Files.readString(WEB_DIR.resolve("base/content/header.html")));
+        } catch (IOException e) {
+            EasyVelocity.getLogger().error("Error loading error page", e);
         }
     }
 
@@ -124,10 +134,7 @@ public class WebServer implements HttpHandler {
         if (pageReturn.getStatusCode() == 200) {
             data = pageReturn.getData();
         } else {
-            data = FileUtils.resourceToString("web/error.html")
-                    .replace("${error}", pageReturn.getStatusCode() + " - " + new String(pageReturn.getData(), StandardCharsets.UTF_8))
-                    .replace("${header}", FileUtils.resourceToString("web/content/header.html"))
-                    .getBytes();
+            data = this.errorPage.replace("${error}", pageReturn.getStatusCode() + " - " + new String(pageReturn.getData(), StandardCharsets.UTF_8)).getBytes();
         }
 
         exchange.getResponseHeaders().add("Server", "RavelCraft");

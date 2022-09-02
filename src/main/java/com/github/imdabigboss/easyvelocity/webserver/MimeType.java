@@ -3,12 +3,16 @@ package com.github.imdabigboss.easyvelocity.webserver;
 import java.util.Locale;
 
 public enum MimeType {
+    PLAIN("text/plain"),
+
     HTML("text/html"),
     JS("application/javascript"),
     CSS("text/css"),
     PNG("image/png"),
     MAP("application/json"),
     ICO("image/x-icon"),
+    ZIP("application/zip"),
+    JAR("application/java-archive"),
 
     EOT("application/vnd.ms-fontobject"),
     SVG("image/svg+xml"),

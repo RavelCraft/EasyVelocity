@@ -1,11 +1,11 @@
 package com.github.imdabigboss.easyvelocity.webserver.endpoints;
 
 import com.github.imdabigboss.easyvelocity.EasyVelocity;
-import com.github.imdabigboss.easyvelocity.utils.FileUtils;
 import com.github.imdabigboss.easyvelocity.utils.XMLParser;
 import com.github.imdabigboss.easyvelocity.webserver.EndpointType;
 import com.github.imdabigboss.easyvelocity.webserver.PageRequest;
 import com.github.imdabigboss.easyvelocity.webserver.PageReturn;
+import com.github.imdabigboss.easyvelocity.webserver.WebServer;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -20,9 +20,30 @@ public class RHTMLEndpoint extends AbstractEndpoint {
     private RHTMLEndpoint(String lang, String title, String description, String path, String prebody, String body) {
         super(EndpointType.SIMPLE, lang.equals("en") ? path : path + lang);
 
-        this.pageBody = FileUtils.resourceToString("web/base_" + lang + ".html")
-                .replace("${header}", FileUtils.resourceToString("web/content/header.html"))
-                .replace("${navbar}", FileUtils.resourceToString("web/content/navbar_" + lang + ".html"))
+        String base = "";
+        try {
+            base = Files.readString(WebServer.WEB_DIR.resolve("base/base_" + lang + ".html"));
+        } catch (IOException e) {
+            EasyVelocity.getLogger().error("Failed to read base_" + lang + ".html", e);
+        }
+
+        String header = "";
+        try {
+            header = Files.readString(WebServer.WEB_DIR.resolve("base/content/header.html"));
+        } catch (IOException e) {
+            EasyVelocity.getLogger().error("Failed to read header.html", e);
+        }
+
+        String navbar = "";
+        try {
+            navbar = Files.readString(WebServer.WEB_DIR.resolve("base/content/navbar_" + lang + ".html"));
+        } catch (IOException e) {
+            EasyVelocity.getLogger().error("Failed to load navbar_" + lang + ".html", e);
+        }
+
+        this.pageBody = base
+                .replace("${header}", header)
+                .replace("${navbar}", navbar)
                 .replace("${description}", description)
                 .replace("${title}", title)
                 .replace("${prebody}", prebody)

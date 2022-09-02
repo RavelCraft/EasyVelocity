@@ -6,8 +6,8 @@ import com.github.imdabigboss.easyvelocity.webserver.PageReturn;
 import com.sun.net.httpserver.HttpExchange;
 
 public abstract class AbstractEndpoint {
-    private final EndpointType type;
-    private final String path;
+    protected final EndpointType type;
+    protected final String path;
 
     public AbstractEndpoint(EndpointType type, String path) {
         this.type = type;
