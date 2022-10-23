@@ -28,7 +28,7 @@ public class TexturePack {
 
     public static void init() {
         if (!EasyVelocity.getConfig().contains("packURL")) {
-            EasyVelocity.getLogger().error("You need to set an export path for the file.");
+            EasyVelocity.getLogger().error("You need to set an export path for the texture pack.");
             return;
         }
         if (!EasyVelocity.getConfig().contains("pathToExportZip")) {

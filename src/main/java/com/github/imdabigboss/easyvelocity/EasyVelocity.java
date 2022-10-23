@@ -36,6 +36,7 @@ public class EasyVelocity {
     private static CustomListManger customListManger = null;
     private static BanManager banManager = null;
     private static NickManager nickManager = null;
+    private static CrackedPlayerManager crackedPlayerManager = null;
 
     private static boolean floodgateAPI = false;
 
@@ -120,6 +121,7 @@ public class EasyVelocity {
         customListManger = new CustomListManger();
         banManager = new BanManager();
         nickManager = new NickManager();
+        crackedPlayerManager = new CrackedPlayerManager();
     }
 
     // --- Getters & setters ---
@@ -138,6 +140,10 @@ public class EasyVelocity {
 
     public static PluginConfig getConfig(String configName) {
         return configManager.getConfig(configName);
+    }
+
+    public static ConfigManager getConfigManager() {
+        return configManager;
     }
 
     public static String getMotdMessage() {
@@ -182,6 +188,10 @@ public class EasyVelocity {
 
     public static NickManager getNickManager() {
         return nickManager;
+    }
+
+    public static CrackedPlayerManager getCrackedPlayerManager() {
+        return crackedPlayerManager;
     }
 
     public static boolean isFloodgateAPI() {

@@ -15,10 +15,7 @@ public class ConfigManager {
     private final Map<String, PluginConfig> configs = new HashMap<>();
 
     public ConfigManager() {
-        PluginConfig config = new PluginConfig(Paths.get("plugins/" + PluginInfo.NAME + "/config.yml"));
-        config.save();
-
-        configs.put("config", config);
+        this.reloadConfigs();
     }
 
     public PluginConfig getConfig(String name) {
@@ -43,7 +40,7 @@ public class ConfigManager {
                     Files.createDirectories(path.getParent());
                     Files.createFile(path);
                 } catch (IOException e) {
-                    EasyVelocity.getLogger().error("Could not create config file at " + path.toAbsolutePath().toString(), e);
+                    EasyVelocity.getLogger().error("Could not create config file at " + path.toAbsolutePath(), e);
                 }
             }
 
@@ -54,6 +51,14 @@ public class ConfigManager {
 
             return config;
         }
+    }
+
+    public void reloadConfigs() {
+        configs.clear();
+
+        PluginConfig config = new PluginConfig(Paths.get("plugins/" + PluginInfo.NAME + "/config.yml"));
+        config.save();
+        configs.put("config", config);
     }
 
     public void saveConfigs() {

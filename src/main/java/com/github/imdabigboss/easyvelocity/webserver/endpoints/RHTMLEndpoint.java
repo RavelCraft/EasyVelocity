@@ -2,10 +2,7 @@ package com.github.imdabigboss.easyvelocity.webserver.endpoints;
 
 import com.github.imdabigboss.easyvelocity.EasyVelocity;
 import com.github.imdabigboss.easyvelocity.utils.XMLParser;
-import com.github.imdabigboss.easyvelocity.webserver.EndpointType;
-import com.github.imdabigboss.easyvelocity.webserver.PageRequest;
-import com.github.imdabigboss.easyvelocity.webserver.PageReturn;
-import com.github.imdabigboss.easyvelocity.webserver.WebServer;
+import com.github.imdabigboss.easyvelocity.webserver.*;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -15,10 +12,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class RHTMLEndpoint extends AbstractEndpoint {
+    private final boolean requireLogin;
     private final String[] pageBody;
 
-    private RHTMLEndpoint(String lang, String title, String description, String path, String prebody, String body) {
+    private RHTMLEndpoint(String lang, String title, String description, String path, boolean requireLogin, String prebody, String body) {
         super(EndpointType.SIMPLE, lang.equals("en") ? path : path + lang);
+
+        this.requireLogin = requireLogin;
 
         String base = "";
         try {
@@ -63,6 +63,7 @@ public class RHTMLEndpoint extends AbstractEndpoint {
         String title = XMLParser.getValue("rhtml.data.title", rawDoc, "No title");
         String description = XMLParser.getValue("rhtml.data.description", rawDoc, "No description");
         String path = XMLParser.getValue("rhtml.data.path", rawDoc, "/");
+        boolean requireLogin = Boolean.parseBoolean(XMLParser.getValue("rhtml.data.requireLogin", rawDoc, "false"));
 
         String prebody = XMLParser.getValue("rhtml.prebody", rawDoc, "");
         String body = XMLParser.getValue("rhtml.body", rawDoc, "");
@@ -71,11 +72,35 @@ public class RHTMLEndpoint extends AbstractEndpoint {
             path += "/";
         }
 
-        return new RHTMLEndpoint(lang, title, description, path, prebody, body);
+        return new RHTMLEndpoint(lang, title, description, path, requireLogin, prebody, body);
+    }
+
+    private String getPosts(String lang) {
+        try {
+            Path folder = Paths.get("/var/www/db/ravelposts/post" + lang);
+            int postNum = (int) Files.list(folder).count();
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = postNum; i > Math.max(postNum - 20, 1); i--) {
+                String[] contents = Files.readString(folder.resolve("post_" + i + ".txt")).split("\\|\\|\\|");
+
+                sb.append("<div class='post-container'><b><span class='post-sender'>").append(contents[0]).append("</span></b><br><p style='font-size: 20px;float: center;'>").append(contents[1].replace("\n", "<br />\n")).append("</p><br><b><span class='post-time'>").append(contents[2]).append(" UTC</span></b><br/></div><br />");
+            }
+
+            return sb.toString();
+        } catch (IOException e) {
+            EasyVelocity.getLogger().error("Error while getting posts", e);
+        }
+
+        return "<div class='post-container'><p style='font-size: 20px;float: center;'>:(</p><br /></div><br />";
     }
 
     @Override
     protected PageReturn getPageContents(PageRequest request) {
+        if (this.requireLogin && !request.getSession().getData().containsKey("loggedIn")) {
+            return new PageReturn("Forbidden", 403, false);
+        }
+
         StringBuilder sb = new StringBuilder();
         for (String s : this.pageBody) {
             if (s.contains("${navbar-link}")) {
@@ -97,25 +122,5 @@ public class RHTMLEndpoint extends AbstractEndpoint {
         }
 
         return new PageReturn(sb.toString());
-    }
-
-    private String getPosts(String lang) {
-        try {
-            Path folder = Paths.get("/var/www/db/ravelposts/post" + lang);
-            int postNum = (int) Files.list(folder).count();
-
-            StringBuilder sb = new StringBuilder();
-            for (int i = postNum; i > Math.max(postNum - 20, 1); i--) {
-                String[] contents = Files.readString(folder.resolve("post_" + i + ".txt")).split("\\|\\|\\|");
-
-                sb.append("<div class='post-container'><b><span class='post-sender'>").append(contents[0]).append("</span></b><br><p style='font-size: 20px;float: center;'>").append(contents[1].replace("\n", "<br />\n")).append("</p><br><b><span class='post-time'>").append(contents[2]).append(" UTC</span></b><br/></div><br />");
-            }
-
-            return sb.toString();
-        } catch (IOException e) {
-            EasyVelocity.getLogger().error("Error while getting posts", e);
-        }
-
-        return "<div class='post-container'><p style='font-size: 20px;float: center;'>:(</p><br /></div><br />";
     }
 }

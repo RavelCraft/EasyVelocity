@@ -3,10 +3,7 @@ package com.github.imdabigboss.easyvelocity.webserver;
 import com.github.imdabigboss.easyvelocity.EasyVelocity;
 import com.github.imdabigboss.easyvelocity.info.PluginInfo;
 import com.github.imdabigboss.easyvelocity.utils.Lock;
-import com.github.imdabigboss.easyvelocity.webserver.endpoints.AbstractEndpoint;
-import com.github.imdabigboss.easyvelocity.webserver.endpoints.RHTMLEndpoint;
-import com.github.imdabigboss.easyvelocity.webserver.endpoints.RobotsEndpoint;
-import com.github.imdabigboss.easyvelocity.webserver.endpoints.StaticEndpoint;
+import com.github.imdabigboss.easyvelocity.webserver.endpoints.*;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -28,6 +25,9 @@ public class WebServer implements HttpHandler {
 
     private final HttpServer httpServer;
 
+    public static final long SESSION_EXPIRY_TIME = 60 * 60; // 1 hour
+    private static final Map<String, WebSession> sessionMap = new HashMap<>();
+
     private final List<AbstractEndpoint> endpoints = new ArrayList<>();
     private String errorPage = "";
 
@@ -37,12 +37,12 @@ public class WebServer implements HttpHandler {
     private final Queue<HttpExchange> exchangeQueue = new LinkedList<>();
 
     public static void create() {
-        if (!EasyVelocity.getConfig().contains("webserver.port")) {
+        if (!EasyVelocity.getConfig("website").contains("webserver.port")) {
             EasyVelocity.getLogger().error("WebServer port not found in config.yml. Aborting.");
             return;
         }
 
-        InetSocketAddress inetSocketAddress = new InetSocketAddress(EasyVelocity.getConfig().getInt("webserver.port"));
+        InetSocketAddress inetSocketAddress = new InetSocketAddress(EasyVelocity.getConfig("website").getInt("webserver.port"));
         HttpServer httpServer;
 
         try {
@@ -80,14 +80,9 @@ public class WebServer implements HttpHandler {
 
     public void reloadInternal() {
         endpoints.clear();
-
         endpoints.add(new RobotsEndpoint());
-        endpoints.add(new StaticEndpoint(EndpointType.SIMPLE, "/favicon.ico"));
-        endpoints.add(new StaticEndpoint(EndpointType.SIMPLE, "/icon.png"));
-
-        endpoints.add(new StaticEndpoint(EndpointType.ALL, "/css"));
-        endpoints.add(new StaticEndpoint(EndpointType.ALL, "/js"));
-        endpoints.add(new StaticEndpoint(EndpointType.ALL, "/img"));
+        endpoints.add(new AuthEndpoint());
+        endpoints.add(new GameEndpoint());
 
         //Never add /downloads
 
@@ -127,19 +122,22 @@ public class WebServer implements HttpHandler {
         if (bestEndpoint != null) {
             pageReturn = bestEndpoint.pageQuery(exchange);
         } else {
-            pageReturn = new PageReturn("Page not found", 404);
+            pageReturn = new PageReturn("Page not found", 404, false);
         }
 
         byte[] data;
-        if (pageReturn.getStatusCode() == 200) {
+        if (pageReturn.getStatusCode() == 200 || pageReturn.isRawData()) {
             data = pageReturn.getData();
         } else {
             data = this.errorPage.replace("${error}", pageReturn.getStatusCode() + " - " + new String(pageReturn.getData(), StandardCharsets.UTF_8)).getBytes();
         }
 
-        exchange.getResponseHeaders().add("Server", "RavelCraft");
-        exchange.getResponseHeaders().add("Date", new Date().toString());
-        exchange.getResponseHeaders().add("Content-Type", pageReturn.getMime());
+        for (Map.Entry<String, String> entry : pageReturn.getHeaders().entrySet()) {
+            exchange.getResponseHeaders().add(entry.getKey(), entry.getValue());
+        }
+        if (pageReturn.getRedirect() != null) {
+            exchange.getResponseHeaders().add("Location", pageReturn.getRedirect());
+        }
 
         try {
             exchange.sendResponseHeaders(pageReturn.getStatusCode(), data.length);
@@ -179,5 +177,27 @@ public class WebServer implements HttpHandler {
             exchangeQueue.add(exchange);
             threadLock.unlock();
         }
+    }
+
+    public static WebSession getSession(String token, boolean create) {
+        WebSession webSession = sessionMap.get(token);
+        if (token == null || webSession == null) {
+            if (create) {
+                webSession = new WebSession();
+                sessionMap.put(webSession.getToken(), webSession);
+            } else {
+                webSession = null;
+            }
+        }
+
+        new Thread(() -> {
+            for (WebSession session : sessionMap.values()) {
+                if (session.isExpired()) {
+                    sessionMap.remove(session.getToken());
+                }
+            }
+        });
+
+        return webSession;
     }
 }

@@ -1,34 +1,38 @@
 package com.github.imdabigboss.easyvelocity.webserver;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 public class PageReturn {
     private final byte[] data;
+    private final boolean rawData;
     private final int statusCode;
-    private final String mime;
+    private String redirect;
+    private final Map<String, String> headers;
 
-    public PageReturn(byte[] data, int statusCode, String mime) {
+    public PageReturn(byte[] data, int statusCode, boolean rawData, String mime) {
         this.data = data;
         this.statusCode = statusCode;
-        this.mime = mime;
+        this.rawData = rawData;
+
+        this.redirect = null;
+
+        this.headers = new HashMap<>();
+        this.headers.put("Server", "RavelCraft");
+        this.headers.put("Date", new Date().toString());
+        this.headers.put("Content-Type", mime);
     }
 
-    public PageReturn(String data, int statusCode, String mime) {
-        this(data.getBytes(), statusCode, mime);
+    public PageReturn(String data, int statusCode, boolean rawData, String mime) {
+        this(data.getBytes(), statusCode, rawData, mime);
     }
-
-    public PageReturn(byte[] data, String mime) {
-        this(data, 200, mime);
-    }
-
-    public PageReturn(String data, int statusCode) {
-        this(data, statusCode, "text/html");
-    }
-
-    public PageReturn(String data, String mime) {
-        this(data, 200, mime);
+    public PageReturn(String data, int statusCode, boolean rawData) {
+        this(data, statusCode, rawData, "text/html");
     }
 
     public PageReturn(String data) {
-        this(data, 200);
+        this(data, 200, false);
     }
 
     public byte[] getData() {
@@ -42,7 +46,23 @@ public class PageReturn {
         return this.statusCode;
     }
 
-    public String getMime() {
-        return this.mime;
+    public boolean isRawData() {
+        return this.rawData;
+    }
+
+    public String getRedirect() {
+        return this.redirect;
+    }
+
+    public void setRedirect(String redirect) {
+        this.redirect = redirect;
+    }
+
+    public Map<String, String> getHeaders() {
+        return this.headers;
+    }
+
+    public void addHeader(String key, String value) {
+        this.headers.put(key, value);
     }
 }

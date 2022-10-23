@@ -10,7 +10,7 @@ import java.util.List;
 
 public class WebsiteCommand extends EasyVelocityCommand {
     public WebsiteCommand() {
-        super("ravelwebsite");
+        super("ravelwebsite", "easyvelocity.ravelwebsite");
     }
 
     @Override

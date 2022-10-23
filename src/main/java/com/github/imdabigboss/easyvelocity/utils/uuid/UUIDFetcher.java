@@ -1,5 +1,6 @@
 package com.github.imdabigboss.easyvelocity.utils.uuid;
 
+import com.github.imdabigboss.easyvelocity.EasyVelocity;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 

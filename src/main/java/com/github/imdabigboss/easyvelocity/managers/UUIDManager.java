@@ -14,11 +14,14 @@ public class UUIDManager {
 
     private final String bedrock = "bedrock.";
     private final String java = "java.";
+    private final String cracked = "cracked.";
 
     public void registerUUID(UUID uuid, String playerName) {
         String tmpName;
         if (playerName.startsWith(".")) {
             tmpName = this.bedrock + playerName.substring(1);
+        } else if (playerName.startsWith("*")) {
+            tmpName = this.cracked + playerName.substring(1);
         } else {
             tmpName = this.java + playerName;
         }
@@ -27,7 +30,7 @@ public class UUIDManager {
         List<String> playerNames = this.uuidConfig.getKeys(true);
         for (String forPlayerName : playerNames) {
             String tmp = forPlayerName + ".";
-            if (tmp.equals(this.bedrock) || tmp.equals(this.java)) {
+            if (tmp.equals(this.bedrock) || tmp.equals(this.java) || tmp.equals(this.cracked)) {
                 continue;
             }
 
@@ -51,6 +54,8 @@ public class UUIDManager {
         String tmpName;
         if (playerName.startsWith(".")) {
             tmpName = this.bedrock + playerName.substring(1);
+        } else if (playerName.startsWith("*")) {
+            tmpName = this.cracked + playerName.substring(1);
         } else {
             tmpName = this.java + playerName;
         }
@@ -86,7 +91,7 @@ public class UUIDManager {
         List<String> playerNames = this.uuidConfig.getKeys(true);
         for (String playerName : playerNames) {
             String tmp = playerName + ".";
-            if (tmp.equals(this.bedrock) || tmp.equals(this.java)) {
+            if (tmp.equals(this.bedrock) || tmp.equals(this.java) || tmp.equals(this.cracked)) {
                 continue;
             }
 
