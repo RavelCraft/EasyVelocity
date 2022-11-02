@@ -109,6 +109,7 @@ public class EasyVelocity {
         new TempbanCommand();
         new ResourcePackCommand();
         new WebsiteCommand();
+        new CrackedCommand();
     }
 
     private void loadManagers() {
