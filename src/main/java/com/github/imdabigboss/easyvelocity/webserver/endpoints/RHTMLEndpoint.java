@@ -2,7 +2,10 @@ package com.github.imdabigboss.easyvelocity.webserver.endpoints;
 
 import com.github.imdabigboss.easyvelocity.EasyVelocity;
 import com.github.imdabigboss.easyvelocity.utils.XMLParser;
-import com.github.imdabigboss.easyvelocity.webserver.*;
+import com.github.imdabigboss.easyvelocity.webserver.EndpointType;
+import com.github.imdabigboss.easyvelocity.webserver.PageRequest;
+import com.github.imdabigboss.easyvelocity.webserver.PageReturn;
+import com.github.imdabigboss.easyvelocity.webserver.WebServer;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;

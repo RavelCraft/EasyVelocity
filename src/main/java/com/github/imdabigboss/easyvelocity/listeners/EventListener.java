@@ -4,7 +4,10 @@ import com.github.imdabigboss.easyvelocity.EasyVelocity;
 import com.github.imdabigboss.easyvelocity.info.PluginInfo;
 import com.github.imdabigboss.easyvelocity.info.ServerInfo;
 import com.github.imdabigboss.easyvelocity.managers.MaintenanceManager;
-import com.github.imdabigboss.easyvelocity.utils.*;
+import com.github.imdabigboss.easyvelocity.utils.ChatColor;
+import com.github.imdabigboss.easyvelocity.utils.ServerUtils;
+import com.github.imdabigboss.easyvelocity.utils.TexturePack;
+import com.github.imdabigboss.easyvelocity.utils.Utils;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.ResultedEvent;
@@ -36,7 +39,7 @@ import java.util.*;
 
 public class EventListener {
     private final List<String> loulouServer = new ArrayList<>();
-    private final List<String> verifiedCrackedUsers = new ArrayList<>();
+    private final List<UUID> verifiedCrackedUsers = new ArrayList<>();
 
     private final ServerPing.SamplePlayer[] samplePlayers;
     private final Favicon emptyFavicon;
@@ -104,11 +107,11 @@ public class EventListener {
     @Subscribe(order = PostOrder.FIRST)
     public void onLoginEvent(LoginEvent event) {
         if (event.getPlayer().getUsername().startsWith("*")) {
-            if (!this.verifiedCrackedUsers.contains(event.getPlayer().getUsername())) {
-                event.setResult(ResultedEvent.ComponentResult.denied(Component.text(ChatColor.RED + "Username or password is incorrect or the login expired.")));
+            if (!this.verifiedCrackedUsers.contains(event.getPlayer().getUniqueId())) {
+                event.setResult(ResultedEvent.ComponentResult.denied(Component.text(ChatColor.RED + "Your login expired")));
                 return;
             } else {
-                this.verifiedCrackedUsers.remove(event.getPlayer().getUsername());
+                this.verifiedCrackedUsers.remove(event.getPlayer().getUniqueId());
             }
         }
 
@@ -211,9 +214,9 @@ public class EventListener {
     @Subscribe
     public void onGameProfileRequest(GameProfileRequestEvent event) {
         if (event.getUsername().startsWith("*")) {
-            GameProfile gameProfile = EasyVelocity.getCrackedPlayerManager().getCrackedProfile(event.getUsername(), event.getGameProfile().getId());
+            GameProfile gameProfile = EasyVelocity.getCrackedPlayerManager().getCrackedProfile(event.getUsername());
             if (gameProfile != null) {
-                this.verifiedCrackedUsers.add(event.getUsername());
+                this.verifiedCrackedUsers.add(gameProfile.getId());
             }
             event.setGameProfile(gameProfile);
         }
