@@ -29,8 +29,8 @@ public class UUIDFetcher {
     private static final String UUID_URL = "https://api.mojang.com/users/profiles/minecraft/%s?at=%d";
     private static final String NAME_URL = "https://api.mojang.com/user/profiles/%s/names";
 
-    private static final String UUID_GEYSER_URL = "https://api.geysermc.org/v2/xbox/xuid/%s";
-    private static final String NAME_GEYSER_URL = "https://api.geysermc.org/v2/xbox/gamertag/%s";
+    private static final String UUID_GEYSER_URL = "https://uuid.kejona.dev/api/v1/xuid/%s";
+    private static final String NAME_GEYSER_URL = "https://uuid.kejona.dev/api/v1/gamertag/%s";
 
     private static final Map<String, UUID> uuidCache = new HashMap<>();
     private static final Map<UUID, String> nameCache = new HashMap<>();
@@ -85,11 +85,11 @@ public class UUIDFetcher {
             }
             String tmpName = name.substring(1);
             try {
-                HttpURLConnection connection = (HttpURLConnection) new URL(String.format(UUID_GEYSER_URL, tmpName)).openConnection();
+                HttpURLConnection connection = (HttpURLConnection) new URL(String.format(NAME_GEYSER_URL, tmpName)).openConnection();
                 connection.setReadTimeout(5000);
                 GeyserUUIDApi data = gson.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), GeyserUUIDApi.class);
 
-                UUID uuid = UUIDTypeAdapter.fromXUID(data.xuid);
+                UUID uuid = UUID.fromString(data.floodgateuid);
 
                 uuidCache.put(name, uuid);
                 nameCache.put(uuid, name);
@@ -144,14 +144,14 @@ public class UUIDFetcher {
             connection.setReadTimeout(5000);
             UUIDFetcher[] nameHistory = gson.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), UUIDFetcher[].class);
             if (nameHistory == null) {
-                connection = (HttpURLConnection) new URL(String.format(NAME_GEYSER_URL, UUIDTypeAdapter.toXUID(uuid))).openConnection();
+                connection = (HttpURLConnection) new URL(String.format(UUID_GEYSER_URL, UUIDTypeAdapter.toXUID(uuid))).openConnection();
                 connection.setReadTimeout(5000);
                 GeyserUUIDApi data = gson.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), GeyserUUIDApi.class);
                 if (data == null) {
                     return null;
                 }
 
-                String name = "." + data.gamertag;
+                String name = "." + data.username;
                 uuidCache.put(name, uuid);
                 nameCache.put(uuid, name);
 

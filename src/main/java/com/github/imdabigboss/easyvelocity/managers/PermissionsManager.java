@@ -14,9 +14,10 @@ public class PermissionsManager {
 
     public PermissionsManager() {
         for (String uuidString : this.config.getKeys(false)) {
-            UUID uuid = UUID.fromString(uuidString);
-
-            this.permissions.put(uuid, this.config.getStringList(uuidString));
+            try {
+                UUID uuid = UUID.fromString(uuidString);
+                this.permissions.put(uuid, this.config.getStringList(uuidString));
+            } catch (IllegalArgumentException ignored) {}
         }
     }
 

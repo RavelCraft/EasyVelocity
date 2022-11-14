@@ -4,6 +4,7 @@ import com.github.imdabigboss.easyvelocity.EasyVelocity;
 import com.github.imdabigboss.easyvelocity.commands.interfaces.EasyCommandSender;
 import com.github.imdabigboss.easyvelocity.commands.interfaces.EasyVelocityCommand;
 import com.github.imdabigboss.easyvelocity.utils.ChatColor;
+import com.github.imdabigboss.easyvelocity.utils.PlayerMessage;
 import com.github.imdabigboss.easyvelocity.utils.Utils;
 import com.velocitypowered.api.proxy.Player;
 
@@ -33,13 +34,13 @@ public class TempbanCommand extends EasyVelocityCommand {
             try {
                 time = Integer.parseInt(args[2]);
             } catch (NumberFormatException e) {
-                sender.sendMessage(ChatColor.RED + "Invalid time: " + args[2] + ". That is not a number. Go back to preschool.");
+                sender.sendMessage(PlayerMessage.COMMAND_TEMPBAN_NAN, args[2]);
                 return;
             }
 
             UUID uuid = EasyVelocity.getUUIDManager().playerNameToUUID(args[1]);
             if (uuid == null) {
-                sender.sendMessage(ChatColor.RED + "That player doesn't exist. Let me go back to sleep.");
+                sender.sendMessage(PlayerMessage.COMMAND_TEMPBAN_PLAYER_NOT_FOUND);
                 return;
             }
 
@@ -56,7 +57,7 @@ public class TempbanCommand extends EasyVelocityCommand {
 
             new Thread(() -> {
                 EasyVelocity.getBanManager().banPlayer(uuid, reason, time);
-                sender.sendMessage(ChatColor.AQUA + args[1] + " has been banned for " + time + " days. ");
+                sender.sendMessage(PlayerMessage.COMMAND_TEMPBAN_BANNED, args[1], time + "");
             }).start();
         } else if (args[0].equalsIgnoreCase("unban")) {
             if (args.length != 2) {
@@ -67,15 +68,15 @@ public class TempbanCommand extends EasyVelocityCommand {
             new Thread(() -> {
                 UUID uuid = EasyVelocity.getUUIDManager().playerNameToUUID(args[1]);
                 if (uuid == null) {
-                    sender.sendMessage(ChatColor.RED + "That player doesn't exist.");
+                    sender.sendMessage(PlayerMessage.COMMAND_TEMPBAN_PLAYER_NOT_FOUND);
                     return;
                 }
 
                 if (EasyVelocity.getBanManager().isPlayerBanned(uuid)) {
                     EasyVelocity.getBanManager().unbanPlayer(uuid);
-                    sender.sendMessage(ChatColor.AQUA + args[1] + " has been unbanned.");
+                    sender.sendMessage(PlayerMessage.COMMAND_TEMPBAN_UNBANNED, args[1]);
                 } else {
-                    sender.sendMessage(ChatColor.RED + "That player is not banned.");
+                    sender.sendMessage(PlayerMessage.COMMAND_TEMPBAN_NOT_BANNED, args[1]);
                 }
             }).start();
         } else if (args[0].equalsIgnoreCase("list")) {
@@ -85,7 +86,7 @@ public class TempbanCommand extends EasyVelocityCommand {
             }
 
             new Thread(() -> {
-                StringBuilder sb = new StringBuilder("Banned players:");
+                StringBuilder sb = new StringBuilder();
                 for (String ban : EasyVelocity.getBanManager().getBans()) {
                     String[] split = ban.split(":");
 
@@ -98,22 +99,19 @@ public class TempbanCommand extends EasyVelocityCommand {
                         continue;
                     }
 
-                    sb.append("\n - ").append(player).append(" banned until ").append(Utils.epochToStringDate(unban)).append(". Reason: ");
+                    sb.append("\n - ").append(player).append(" - ").append(Utils.epochToStringDate(unban)).append(": ");
                     for (int i = 2; i < split.length; i++) {
                         sb.append(split[i]).append(" ");
                     }
                 }
 
-                sender.sendMessage(sb.toString());
+                sender.sendMessage(PlayerMessage.COMMAND_TEMPBAN_LIST, sb.toString());
             }).start();
         }
     }
 
     private void sendHelp(EasyCommandSender sender) {
-        sender.sendMessage(ChatColor.RED + "Usage:\n" +
-                " - /tempban ban <player> <time: days> [reason]\n" +
-                " - /tempban unban <player>\n" +
-                " - /tempban list");
+        sender.sendMessage(PlayerMessage.COMMAND_TEMPBAN_HELP);
     }
 
     @Override

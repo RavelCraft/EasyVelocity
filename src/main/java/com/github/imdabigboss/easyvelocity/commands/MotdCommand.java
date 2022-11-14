@@ -4,6 +4,7 @@ import com.github.imdabigboss.easyvelocity.EasyVelocity;
 import com.github.imdabigboss.easyvelocity.commands.interfaces.EasyCommandSender;
 import com.github.imdabigboss.easyvelocity.commands.interfaces.EasyVelocityCommand;
 import com.github.imdabigboss.easyvelocity.utils.ChatColor;
+import com.github.imdabigboss.easyvelocity.utils.PlayerMessage;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +17,7 @@ public class MotdCommand extends EasyVelocityCommand {
     @Override
     public void execute(EasyCommandSender sender, String[] args) {
         if (args.length == 0) {
-            sender.sendMessage(ChatColor.RED + "Usage: /setmotd <message>");
+            sender.sendMessage(PlayerMessage.COMMAND_MOTD_HELP);
             return;
         }
 
@@ -27,7 +28,7 @@ public class MotdCommand extends EasyVelocityCommand {
         EasyVelocity.getConfig().set("motdMessage", motd);
         EasyVelocity.getConfig().save();
 
-        sender.sendMessage(ChatColor.AQUA + "Motd was updated!");
+        sender.sendMessage(PlayerMessage.COMMAND_MOTD_UPDATED);
     }
 
     @Override

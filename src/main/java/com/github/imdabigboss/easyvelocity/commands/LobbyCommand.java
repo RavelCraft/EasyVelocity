@@ -4,7 +4,7 @@ import com.github.imdabigboss.easyvelocity.EasyVelocity;
 import com.github.imdabigboss.easyvelocity.commands.interfaces.EasyCommandSender;
 import com.github.imdabigboss.easyvelocity.commands.interfaces.EasyVelocityCommand;
 import com.github.imdabigboss.easyvelocity.info.ServerInfo;
-import com.github.imdabigboss.easyvelocity.utils.ChatColor;
+import com.github.imdabigboss.easyvelocity.utils.PlayerMessage;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 
@@ -14,34 +14,35 @@ import java.util.Optional;
 
 public class LobbyCommand extends EasyVelocityCommand {
     public LobbyCommand() {
-        super("lobby", "", "l");
+        super("lobby", "", "l", "hub");
     }
 
     @Override
     public void execute(EasyCommandSender sender, String[] args) {
-        Player player = sender.getPlayer();
-        if (player != null) {
-            if (player.getCurrentServer().isPresent()) {
-                if (player.getCurrentServer().get().getServerInfo().getName().equalsIgnoreCase(ServerInfo.LOBBY_SERVER_NAME)) {
-                    sender.sendMessage(ChatColor.RED + "You are already in the lobby!");
-                    return;
-                }
-            }
+        if (sender.isConsole()) {
+            sender.sendMessage(PlayerMessage.COMMAND_MUST_BE_PLAYER);
+            return;
+        }
 
-            Optional<RegisteredServer> lobbyServer = EasyVelocity.getServer().getServer(ServerInfo.LOBBY_SERVER_NAME);
-            if (lobbyServer.isPresent()) {
-                player.createConnectionRequest(lobbyServer.get()).connect().thenAccept(connection -> {
-                    if (connection.isSuccessful()) {
-                        sender.sendMessage(ChatColor.AQUA + "You have been sent to the lobby!");
-                    } else {
-                        sender.sendMessage(ChatColor.RED + "An error occurred while sending you to the lobby...");
-                    }
-                });
-            } else {
-                sender.sendMessage(ChatColor.RED + "There is no lobby server...");
+        Player player = sender.getPlayer();
+        if (player.getCurrentServer().isPresent()) {
+            if (player.getCurrentServer().get().getServerInfo().getName().equalsIgnoreCase(ServerInfo.LOBBY_SERVER_NAME)) {
+                sender.sendMessage(PlayerMessage.COMMAND_LOBBY_ALREADY_IN);
+                return;
             }
+        }
+
+        Optional<RegisteredServer> lobbyServer = EasyVelocity.getServer().getServer(ServerInfo.LOBBY_SERVER_NAME);
+        if (lobbyServer.isPresent()) {
+            player.createConnectionRequest(lobbyServer.get()).connect().thenAccept(connection -> {
+                if (connection.isSuccessful()) {
+                    sender.sendMessage(PlayerMessage.COMMAND_LOBBY_SUCCESS);
+                } else {
+                    sender.sendMessage(PlayerMessage.COMMAND_LOBBY_ERROR);
+                }
+            });
         } else {
-            sender.sendMessage(ChatColor.RED + "You can't use this command from console!");
+            sender.sendMessage(PlayerMessage.COMMAND_LOBBY_NOT_FOUND);
         }
     }
 

@@ -4,6 +4,7 @@ import com.github.imdabigboss.easyvelocity.EasyVelocity;
 import com.github.imdabigboss.easyvelocity.commands.interfaces.EasyCommandSender;
 import com.github.imdabigboss.easyvelocity.commands.interfaces.EasyVelocityCommand;
 import com.github.imdabigboss.easyvelocity.utils.ChatColor;
+import com.github.imdabigboss.easyvelocity.utils.PlayerMessage;
 import com.github.imdabigboss.easyvelocity.utils.TexturePack;
 import com.velocitypowered.api.proxy.Player;
 
@@ -26,38 +27,38 @@ public class ResourcePackCommand extends EasyVelocityCommand {
         if (args[0].equalsIgnoreCase("generate")) {
             new Thread(() -> {
                 TexturePack.generatePack();
-                sender.sendMessage(ChatColor.AQUA + "Generated resource pack.");
+                sender.sendMessage(PlayerMessage.COMMAND_PACK_GENERATED);
             }).start();
         } else if (args[0].equalsIgnoreCase("send")) {
             if (args.length == 1) {
                 if (sender.isConsole()) {
-                    sender.sendMessage(ChatColor.RED + "You must specify a player.");
+                    sender.sendMessage(PlayerMessage.COMMAND_PACK_SPECIFY_PLAYER);
                 } else {
                     TexturePack.sendTexturePackToPlayer(sender.getPlayer());
-                    sender.sendMessage(ChatColor.AQUA + "Resource pack sent.");
+                    sender.sendMessage(PlayerMessage.COMMAND_PACK_SENT);
                 }
             } else if (args.length == 2) {
                 Optional<Player> player = EasyVelocity.getServer().getPlayer(args[1]);
                 if (!player.isPresent()) {
-                    sender.sendMessage(ChatColor.RED + "Player not found.");
+                    sender.sendMessage(PlayerMessage.COMMAND_PACK_NO_PLAYER);
                     return;
                 }
 
                 TexturePack.sendTexturePackToPlayer(player.get());
-                sender.sendMessage(ChatColor.AQUA + "Resource pack sent.");
+                sender.sendMessage(PlayerMessage.COMMAND_PACK_SENT);
             }
         } else if (args[0].equalsIgnoreCase("sendall")) {
             for (Player player : EasyVelocity.getServer().getAllPlayers()) {
                 TexturePack.sendTexturePackToPlayer(player);
             }
-            sender.sendMessage(ChatColor.AQUA + "Resource pack sent to all players.");
+            sender.sendMessage(PlayerMessage.COMMAND_PACK_SENT_ALL);
         } else {
             this.sendHelp(sender);
         }
     }
 
     private void sendHelp(EasyCommandSender sender) {
-        sender.sendMessage("The correct usage is:\n - generate\n - send [player]\n - sendall");
+        sender.sendMessage(PlayerMessage.COMMAND_PACK_HELP);
     }
 
     @Override

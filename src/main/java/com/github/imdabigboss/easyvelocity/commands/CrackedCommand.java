@@ -4,6 +4,7 @@ import com.github.imdabigboss.easyvelocity.EasyVelocity;
 import com.github.imdabigboss.easyvelocity.commands.interfaces.EasyCommandSender;
 import com.github.imdabigboss.easyvelocity.commands.interfaces.EasyVelocityCommand;
 import com.github.imdabigboss.easyvelocity.utils.ChatColor;
+import com.github.imdabigboss.easyvelocity.utils.PlayerMessage;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 
@@ -18,13 +19,13 @@ public class CrackedCommand extends EasyVelocityCommand {
     @Override
     public void execute(EasyCommandSender sender, String[] args) {
         if (args.length != 1) {
-            sender.sendMessage(ChatColor.RED + "Usage: /proxycracked <reload>");
+            sender.sendMessage(PlayerMessage.COMMAND_CRACKED_HELP);
             return;
         }
 
         if (args[0].equalsIgnoreCase("reload")) {
-            EasyVelocity.getConfigManager().reloadConfigs();
-            sender.sendMessage(ChatColor.GREEN + "Cracked config reloaded!");
+            EasyVelocity.getConfig("cracked").reload();
+            sender.sendMessage(PlayerMessage.COMMAND_CRACKED_RELOADED);
         }
     }
 

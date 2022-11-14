@@ -37,6 +37,7 @@ public class EasyVelocity {
     private static BanManager banManager = null;
     private static NickManager nickManager = null;
     private static CrackedPlayerManager crackedPlayerManager = null;
+    private static LanguageManager languageManager = null;
 
     private static boolean floodgateAPI = false;
 
@@ -110,6 +111,8 @@ public class EasyVelocity {
         new ResourcePackCommand();
         new WebsiteCommand();
         new CrackedCommand();
+        new ConfigCommand();
+        new LanguageCommand();
     }
 
     private void loadManagers() {
@@ -123,6 +126,7 @@ public class EasyVelocity {
         banManager = new BanManager();
         nickManager = new NickManager();
         crackedPlayerManager = new CrackedPlayerManager();
+        languageManager = new LanguageManager();
     }
 
     // --- Getters & setters ---
@@ -193,6 +197,10 @@ public class EasyVelocity {
 
     public static CrackedPlayerManager getCrackedPlayerManager() {
         return crackedPlayerManager;
+    }
+
+    public static LanguageManager getLanguageManager() {
+        return languageManager;
     }
 
     public static boolean isFloodgateAPI() {

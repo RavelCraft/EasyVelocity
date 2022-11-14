@@ -3,6 +3,7 @@ package com.github.imdabigboss.easyvelocity.commands;
 import com.github.imdabigboss.easyvelocity.commands.interfaces.EasyCommandSender;
 import com.github.imdabigboss.easyvelocity.commands.interfaces.EasyVelocityCommand;
 import com.github.imdabigboss.easyvelocity.utils.ChatColor;
+import com.github.imdabigboss.easyvelocity.utils.PlayerMessage;
 import com.github.imdabigboss.easyvelocity.webserver.WebServer;
 
 import java.util.ArrayList;
@@ -23,12 +24,10 @@ public class WebsiteCommand extends EasyVelocityCommand {
 
             if (args[0].equals("reload")) {
                 WebServer.reload();
-                sender.sendMessage(ChatColor.GREEN + "Website reloaded!");
+                sender.sendMessage(PlayerMessage.COMMAND_WEBSITE_RELOADED);
             } else {
                 this.sendHelp(sender);
             }
-
-            return;
         }
 
         //TODO
@@ -36,8 +35,7 @@ public class WebsiteCommand extends EasyVelocityCommand {
 
     private void sendHelp(EasyCommandSender sender) {
         if (sender.isConsole()) {
-            sender.sendMessage(ChatColor.RED + "Usage: /ravelwebsite reload");
-            return;
+            sender.sendMessage(PlayerMessage.COMMAND_WEBSITE_HELP);
         }
 
         //TODO

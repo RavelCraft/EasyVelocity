@@ -4,6 +4,7 @@ import com.github.imdabigboss.easyvelocity.EasyVelocity;
 import com.github.imdabigboss.easyvelocity.commands.interfaces.EasyCommandSender;
 import com.github.imdabigboss.easyvelocity.commands.interfaces.EasyVelocityCommand;
 import com.github.imdabigboss.easyvelocity.utils.ChatColor;
+import com.github.imdabigboss.easyvelocity.utils.PlayerMessage;
 import com.velocitypowered.api.proxy.Player;
 import net.kyori.adventure.text.Component;
 
@@ -19,15 +20,15 @@ public class VelocityKickCommand extends EasyVelocityCommand {
     @Override
     public void execute(EasyCommandSender sender, String[] args) {
         if (args.length != 1) {
-            sender.sendMessage(ChatColor.RED + "Usage: /proxykick <player>");
+            sender.sendMessage(PlayerMessage.COMMAND_KICK_HELP);
             return;
         }
 
         Optional<Player> player = EasyVelocity.getServer().getPlayer(args[0]);
         if (player.isPresent()) {
-            player.get().disconnect(Component.text(ChatColor.RED + "You were kicked from the network."));
+            player.get().disconnect(PlayerMessage.formatMessage(PlayerMessage.COMMAND_KICK_MESSAGE, player.get()));
         } else {
-            sender.sendMessage(ChatColor.RED + "Player not found.");
+            sender.sendMessage(PlayerMessage.COMMAND_KICK_PLAYER_NOT_FOUND);
         }
     }
 

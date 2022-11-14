@@ -58,10 +58,6 @@ public class CrackedPlayerManager {
         return true;
     }
 
-    public void reloadConfig() {
-        this.config.reload();
-    }
-
     public static class CrackedPlayerSession {
         private final String name;
         private final long time;

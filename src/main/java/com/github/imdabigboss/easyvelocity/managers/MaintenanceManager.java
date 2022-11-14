@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class MaintenanceManager {
-    private List<UUID> maintenanceBypass = new ArrayList<>();
+    private final List<UUID> maintenanceBypass = new ArrayList<>();
     private boolean maintenanceMode = false;
     private final PluginConfig config = EasyVelocity.getConfig();
 

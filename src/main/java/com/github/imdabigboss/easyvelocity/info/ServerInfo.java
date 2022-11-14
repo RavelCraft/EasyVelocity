@@ -10,5 +10,4 @@ public class ServerInfo {
     public static final String LOBBY_SERVER_NAME = "lobby";
 
     public static final int MAX_PLAYERS = 100;
-    public static final int MAX_LOULOU_PLAYERS = 10;
 }

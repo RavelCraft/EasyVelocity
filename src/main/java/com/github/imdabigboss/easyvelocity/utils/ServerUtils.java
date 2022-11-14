@@ -5,6 +5,12 @@ import com.velocitypowered.api.proxy.Player;
 import net.kyori.adventure.text.Component;
 
 public class ServerUtils {
+    public static void broadcast(PlayerMessage message, String... args) {
+        for (Player player : EasyVelocity.getServer().getAllPlayers()) {
+            player.sendMessage(PlayerMessage.formatMessage(message, player, args));
+        }
+    }
+
     public static void broadcast(String message) {
         for (Player player : EasyVelocity.getServer().getAllPlayers()) {
             player.sendMessage(Component.text(message));

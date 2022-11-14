@@ -16,15 +16,18 @@ public class UUIDManager {
     private final String java = "java.";
     private final String cracked = "cracked.";
 
-    public void registerUUID(UUID uuid, String playerName) {
-        String tmpName;
-        if (playerName.startsWith(".")) {
-            tmpName = this.bedrock + playerName.substring(1);
-        } else if (playerName.startsWith("*")) {
-            tmpName = this.cracked + playerName.substring(1);
+    private String formatConfigName(String name) {
+        if (name.startsWith(".")) {
+            return this.bedrock + name.substring(1);
+        } else if (name.startsWith("*")) {
+            return this.cracked + name.substring(1);
         } else {
-            tmpName = this.java + playerName;
+            return this.java + name;
         }
+    }
+
+    public void registerUUID(UUID uuid, String playerName) {
+        String tmpName = this.formatConfigName(playerName);
 
         this.uuidConfig.reload();
         List<String> playerNames = this.uuidConfig.getKeys(true);
@@ -51,24 +54,18 @@ public class UUIDManager {
             return player.get().getUniqueId();
         }
 
-        String tmpName;
-        if (playerName.startsWith(".")) {
-            tmpName = this.bedrock + playerName.substring(1);
-        } else if (playerName.startsWith("*")) {
-            tmpName = this.cracked + playerName.substring(1);
-        } else {
-            tmpName = this.java + playerName;
-        }
+        String tmpName = this.formatConfigName(playerName);
 
         this.uuidConfig.reload();
         if (this.uuidConfig.contains(tmpName)) {
             String tmp = this.uuidConfig.getString(tmpName);
             if (tmp != null) {
-                return UUID.fromString(tmp);
+                try {
+                    return UUID.fromString(tmp);
+                } catch (IllegalArgumentException ignored) {
+                }
             }
         }
-
-
 
         UUID uuid = UUIDFetcher.getUUID(playerName);
         if (uuid != null) {
@@ -98,9 +95,11 @@ public class UUIDManager {
             String uuidString = this.uuidConfig.getString(playerName);
             if (uuidString.equals(uuid.toString())) {
                 if (playerName.startsWith(this.bedrock)) {
-                    return playerName.substring(7);
+                    return playerName.substring(this.bedrock.length()) + ".";
                 } else if (playerName.startsWith(this.java)) {
-                    return playerName.substring(5);
+                    return playerName.substring(this.java.length());
+                } else if (playerName.startsWith(this.cracked)) {
+                    return playerName.substring(this.cracked.length()) + "*";
                 } else {
                     EasyVelocity.getLogger().error("Something is wrong in the UUID config!!! " + playerName);
                     return null;

@@ -4,6 +4,7 @@ import com.github.imdabigboss.easyvelocity.EasyVelocity;
 import com.github.imdabigboss.easyvelocity.commands.interfaces.EasyCommandSender;
 import com.github.imdabigboss.easyvelocity.commands.interfaces.EasyVelocityCommand;
 import com.github.imdabigboss.easyvelocity.utils.ChatColor;
+import com.github.imdabigboss.easyvelocity.utils.PlayerMessage;
 import com.velocitypowered.api.proxy.Player;
 
 import java.util.*;
@@ -29,15 +30,15 @@ public class RanksCommand extends EasyVelocityCommand {
             new Thread(() -> {
                 UUID found = EasyVelocity.getUUIDManager().playerNameToUUID(args[1]);
                 if (found == null) {
-                    sender.sendMessage(ChatColor.RED + "Player not found.");
+                    sender.sendMessage(PlayerMessage.COMMAND_RANKS_PLAYER_NOT_FOUND);
                     return;
                 }
 
                 String foundRank = EasyVelocity.getRanksManager().getRank(found);
                 if (foundRank.equals("")) {
-                    sender.sendMessage(ChatColor.AQUA + args[1] + " has no rank.");
+                    sender.sendMessage(PlayerMessage.COMMAND_RANKS_NO_RANK, args[1]);
                 } else {
-                    sender.sendMessage(ChatColor.AQUA + args[1] + " has rank: " + foundRank + ".");
+                    sender.sendMessage(PlayerMessage.COMMAND_RANKS_PLAYER_RANK, args[1], foundRank);
                 }
             }).start();
         } else if (args[0].equalsIgnoreCase("set")) {
@@ -49,15 +50,15 @@ public class RanksCommand extends EasyVelocityCommand {
             new Thread(() -> {
                 UUID found = EasyVelocity.getUUIDManager().playerNameToUUID(args[1]);
                 if (found == null) {
-                    sender.sendMessage(ChatColor.RED + "Player not found.");
+                    sender.sendMessage(PlayerMessage.COMMAND_RANKS_PLAYER_NOT_FOUND);
                     return;
                 }
 
                 boolean managed = EasyVelocity.getRanksManager().setPlayerRank(found, args[2]);
                 if (managed) {
-                    sender.sendMessage(ChatColor.AQUA + args[1] + "'s rank has been set to " + args[2] + ".");
+                    sender.sendMessage(PlayerMessage.COMMAND_RANKS_PLAYER_RANK_SET, args[1], args[2]);
                 } else {
-                    sender.sendMessage(ChatColor.RED + "Rank not found or the player already has that rank.");
+                    sender.sendMessage(PlayerMessage.COMMAND_RANKS_NO_RANK);
                 }
             }).start();
         } else if (args[0].equalsIgnoreCase("add")) {
@@ -68,9 +69,9 @@ public class RanksCommand extends EasyVelocityCommand {
 
             boolean managed = EasyVelocity.getRanksManager().addRank(args[1], args[2]);
             if (managed) {
-                sender.sendMessage(ChatColor.AQUA + "Rank " + args[1] + " has been added.");
+                sender.sendMessage(PlayerMessage.COMMAND_RANKS_ADDED);
             } else {
-                sender.sendMessage(ChatColor.RED + "Rank already exists.");
+                sender.sendMessage(PlayerMessage.COMMAND_RANKS_ALREADY_EXISTS);
             }
         } else if (args[0].equalsIgnoreCase("remove")) {
             if (args.length != 2) {
@@ -80,33 +81,33 @@ public class RanksCommand extends EasyVelocityCommand {
 
             boolean managed = EasyVelocity.getRanksManager().removeRank(args[1]);
             if (managed) {
-                sender.sendMessage(ChatColor.AQUA + "Rank " + args[1] + " has been removed.");
+                sender.sendMessage(PlayerMessage.COMMAND_RANKS_REMOVED);
             } else {
-                sender.sendMessage(ChatColor.RED + "Rank not found.");
+                sender.sendMessage(PlayerMessage.COMMAND_RANKS_NO_RANK);
             }
         } else if (args[0].equalsIgnoreCase("list")) {
             Set<Map.Entry<String, String>> ranks = EasyVelocity.getRanksManager().getRanks();
             if (ranks.size() == 0) {
-                sender.sendMessage(ChatColor.RED + "No ranks found.");
+                sender.sendMessage(PlayerMessage.COMMAND_RANKS_NO_RANKS);
             } else {
-                StringBuilder message = new StringBuilder(ChatColor.BOLD + "Ranks:" + ChatColor.RESET);
+                StringBuilder message = new StringBuilder();
                 for (Map.Entry<String, String> rank : ranks) {
                     message.append("\n").append(" - ").append(rank.getValue()).append(rank.getKey()).append(ChatColor.RESET);
                 }
 
-                sender.sendMessage(message.toString());
+                sender.sendMessage(PlayerMessage.COMMAND_RANKS_LIST, message.toString());
             }
         } else if (args[0].equalsIgnoreCase("reload")) {
             EasyVelocity.getRanksManager().reloadRanks();
 
-            sender.sendMessage(ChatColor.AQUA + "Ranks reloaded.");
+            sender.sendMessage(PlayerMessage.COMMAND_RANKS_RELOADED);
         } else {
             sendHelp(sender);
         }
     }
 
     private void sendHelp(EasyCommandSender sender) {
-        sender.sendMessage(ChatColor.RED + "Usage: 'get' <player>, 'set' <player>, 'add' <rank> <color>, 'remove' <rank>, 'reload' or 'list'");
+        sender.sendMessage(PlayerMessage.COMMAND_RANKS_HELP);
     }
 
     @Override

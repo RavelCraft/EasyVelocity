@@ -4,6 +4,7 @@ import com.github.imdabigboss.easyvelocity.EasyVelocity;
 import com.github.imdabigboss.easyvelocity.commands.interfaces.EasyCommandSender;
 import com.github.imdabigboss.easyvelocity.commands.interfaces.EasyVelocityCommand;
 import com.github.imdabigboss.easyvelocity.utils.ChatColor;
+import com.github.imdabigboss.easyvelocity.utils.PlayerMessage;
 import com.velocitypowered.api.proxy.Player;
 import net.kyori.adventure.text.Component;
 
@@ -20,13 +21,13 @@ public class VelocityNickCommand extends EasyVelocityCommand {
     @Override
     public void execute(EasyCommandSender sender, String[] args) {
         if (args.length != 2) {
-            sender.sendMessage(ChatColor.RED + "Usage: /proxynick <player> <player>/stop");
+            sender.sendMessage(PlayerMessage.COMMAND_NICK_HELP);
             return;
         }
 
         UUID playerUUID = EasyVelocity.getUUIDManager().playerNameToUUID(args[0]);
         if (playerUUID == null) {
-            sender.sendMessage(ChatColor.RED + "Player not found.");
+            sender.sendMessage(PlayerMessage.COMMAND_NICK_PLAYER_NOT_FOUND);
             return;
         }
 
@@ -41,22 +42,22 @@ public class VelocityNickCommand extends EasyVelocityCommand {
 
             Optional<Player> player = EasyVelocity.getServer().getPlayer(playerUUID);
             if (player.isPresent()) {
-                player.get().disconnect(Component.text("You have been un-nicked."));
+                player.get().disconnect(PlayerMessage.formatMessage(PlayerMessage.COMMAND_NICK_STOP, player.get()));
             }
             player = EasyVelocity.getServer().getPlayer(nickedUUID);
             if (player.isPresent()) {
-                player.get().disconnect(Component.text("You have been un-nicked."));
+                player.get().disconnect(PlayerMessage.formatMessage(PlayerMessage.COMMAND_NICK_STOP, player.get()));
             }
         } else {
             UUID newUuid = EasyVelocity.getUUIDManager().playerNameToUUID(args[1]);
 
             if (newUuid == null) {
-                sender.sendMessage(ChatColor.RED + "Player not found.");
+                sender.sendMessage(PlayerMessage.COMMAND_NICK_PLAYER_NOT_FOUND);
                 return;
             }
 
             EasyVelocity.getNickManager().setNick(originalUUID, newUuid);
-            sender.sendMessage(ChatColor.AQUA + "Should be done! Rejoin if needed.");
+            sender.sendMessage(PlayerMessage.COMMAND_NICK_REJOIN);
         }
     }
 

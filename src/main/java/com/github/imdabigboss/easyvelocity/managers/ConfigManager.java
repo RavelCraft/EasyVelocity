@@ -31,9 +31,9 @@ public class ConfigManager {
         }
     }
 
-    public PluginConfig createConfig(Path path, String name) {
+    public void createConfig(Path path, String name) {
         if (configs.containsKey(name)) {
-            return configs.get(name);
+            throw new IllegalArgumentException("Config already exists!");
         } else {
             if (Files.notExists(path)) {
                 try {
@@ -48,8 +48,6 @@ public class ConfigManager {
             config.save();
 
             configs.put(name, config);
-
-            return config;
         }
     }
 

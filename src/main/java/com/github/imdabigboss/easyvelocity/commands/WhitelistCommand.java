@@ -4,6 +4,7 @@ import com.github.imdabigboss.easyvelocity.EasyVelocity;
 import com.github.imdabigboss.easyvelocity.commands.interfaces.EasyCommandSender;
 import com.github.imdabigboss.easyvelocity.commands.interfaces.EasyVelocityCommand;
 import com.github.imdabigboss.easyvelocity.utils.ChatColor;
+import com.github.imdabigboss.easyvelocity.utils.PlayerMessage;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 
@@ -18,41 +19,41 @@ public class WhitelistCommand extends EasyVelocityCommand {
     @Override
     public void execute(EasyCommandSender sender, String[] args) {
         if (args.length != 2 && args.length != 3) {
-            sender.sendMessage(ChatColor.RED + "Usage: /proxywhitelist <add/remove/enable> <player/true/false> [server]");
+            sender.sendMessage(PlayerMessage.COMMAND_WHITELIST_HELP);
         }
 
         new Thread(() -> {
             if (args.length == 2) {
                 if (args[0].equalsIgnoreCase("add")) {
                     if (EasyVelocity.getWhitelistManager().addPlayer(EasyVelocity.getUUIDManager().playerNameToUUID(args[1]))) {
-                        sender.sendMessage(ChatColor.AQUA + "Added " + args[1] + " to the whitelist.");
+                        sender.sendMessage(PlayerMessage.COMMAND_WHITELIST_ADDED, args[1]);
                     } else {
-                        sender.sendMessage(ChatColor.RED + "Failed to add " + args[1] + " to the whitelist.");
+                        sender.sendMessage(PlayerMessage.COMMAND_WHITELIST_ADD_FAILED, args[1]);
                     }
                 } else if (args[0].equalsIgnoreCase("remove")) {
                     if (EasyVelocity.getWhitelistManager().removePlayer(EasyVelocity.getUUIDManager().playerNameToUUID(args[1]))) {
-                        sender.sendMessage(ChatColor.AQUA + "Removed " + args[1] + " from the whitelist.");
+                        sender.sendMessage(PlayerMessage.COMMAND_WHITELIST_REMOVED, args[1]);
                     } else {
-                        sender.sendMessage(ChatColor.RED + "Failed to remove " + args[1] + " from the whitelist.");
+                        sender.sendMessage(PlayerMessage.COMMAND_WHITELIST_REMOVE_FAILED, args[1]);
                     }
                 }
             } else if (args.length == 3) {
                 if (args[0].equalsIgnoreCase("add")) {
                     if (EasyVelocity.getWhitelistManager().addPlayer(EasyVelocity.getUUIDManager().playerNameToUUID(args[1]), args[2])) {
-                        sender.sendMessage(ChatColor.AQUA + "Added " + args[1] + " to the whitelist on " + args[2] + ".");
+                        sender.sendMessage(PlayerMessage.COMMAND_WHITELIST_ADDED_SERVER, args[1], args[2]);
                     } else {
-                        sender.sendMessage(ChatColor.RED + "Failed to add " + args[1] + " to the whitelist on " + args[2] + ".");
+                        sender.sendMessage(PlayerMessage.COMMAND_WHITELIST_ADD_FAILED, args[1]);
                     }
                 } else if (args[0].equalsIgnoreCase("remove")) {
                     if (EasyVelocity.getWhitelistManager().removePlayer(EasyVelocity.getUUIDManager().playerNameToUUID(args[1]), args[2])) {
-                        sender.sendMessage(ChatColor.AQUA + "Removed " + args[1] + " from the whitelist on " + args[2] + ".");
+                        sender.sendMessage(PlayerMessage.COMMAND_WHITELIST_REMOVED_SERVER, args[1], args[2]);
                     } else {
-                        sender.sendMessage(ChatColor.RED + "Failed to remove " + args[1] + " from the whitelist on " + args[2] + ".");
+                        sender.sendMessage(PlayerMessage.COMMAND_WHITELIST_REMOVE_FAILED, args[1]);
                     }
                 } else if (args[0].equalsIgnoreCase("enable")) {
                     if (args[1].equalsIgnoreCase("true")) {
                         EasyVelocity.getWhitelistManager().setEnabled(args[2], true);
-                        sender.sendMessage(ChatColor.AQUA + "Whitelist enabled.");
+                        sender.sendMessage(PlayerMessage.COMMAND_WHITELIST_ENABLED);
                     } else if (args[1].equalsIgnoreCase("false")) {
                         EasyVelocity.getWhitelistManager().setEnabled(args[2], false);
                     }

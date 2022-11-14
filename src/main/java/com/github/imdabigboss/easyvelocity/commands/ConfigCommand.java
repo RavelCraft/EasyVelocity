@@ -4,13 +4,14 @@ import com.github.imdabigboss.easyvelocity.EasyVelocity;
 import com.github.imdabigboss.easyvelocity.commands.interfaces.EasyCommandSender;
 import com.github.imdabigboss.easyvelocity.commands.interfaces.EasyVelocityCommand;
 import com.github.imdabigboss.easyvelocity.utils.ChatColor;
+import com.github.imdabigboss.easyvelocity.utils.PlayerMessage;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ConfigCommand extends EasyVelocityCommand {
     public ConfigCommand() {
-        super("ravelconfig", "easyvelocity.ravelconfig");
+        super("proxyconfig", "easyvelocity.proxyconfig", "pconfig");
     }
 
     @Override
@@ -22,14 +23,14 @@ public class ConfigCommand extends EasyVelocityCommand {
 
         if (args[0].equals("reload")) {
             EasyVelocity.getConfigManager().reloadConfigs();
-            sender.sendMessage(ChatColor.GREEN + "Website reloaded!");
+            sender.sendMessage(PlayerMessage.COMMAND_CONFIG_RELOADED);
         } else {
             this.sendHelp(sender);
         }
     }
 
     private void sendHelp(EasyCommandSender sender) {
-        sender.sendMessage(ChatColor.RED + "Usage: /ravelconfig reload");
+        sender.sendMessage(PlayerMessage.COMMAND_CONFIG_HELP);
     }
 
     @Override

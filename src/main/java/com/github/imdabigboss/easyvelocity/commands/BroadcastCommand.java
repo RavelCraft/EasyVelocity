@@ -10,7 +10,7 @@ import java.util.List;
 
 public class BroadcastCommand extends EasyVelocityCommand {
     public BroadcastCommand() {
-        super("broadcast", "easyvelocity.broadcast", "psay");
+        super("proxysay", "easyvelocity.broadcast", "psay");
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.github.imdabigboss.easyvelocity.EasyVelocity;
 import com.github.imdabigboss.easyvelocity.commands.interfaces.EasyCommandSender;
 import com.github.imdabigboss.easyvelocity.commands.interfaces.EasyVelocityCommand;
 import com.github.imdabigboss.easyvelocity.utils.ChatColor;
+import com.github.imdabigboss.easyvelocity.utils.PlayerMessage;
 import com.velocitypowered.api.proxy.Player;
 
 import java.util.ArrayList;
@@ -23,32 +24,30 @@ public class MaintenanceCommand extends EasyVelocityCommand {
 
         if (args[0].equalsIgnoreCase("on")) {
             EasyVelocity.getMaintenanceManager().setMaintenance(true);
-            sender.sendMessage(ChatColor.AQUA + "Maintenance mode has been enabled!");
+            sender.sendMessage(PlayerMessage.COMMAND_MAINTENANCE_ENABLED);
         } else if (args[0].equalsIgnoreCase("off")) {
             EasyVelocity.getMaintenanceManager().setMaintenance(false);
-            sender.sendMessage(ChatColor.AQUA + "Maintenance mode has been disabled!");
+            sender.sendMessage(PlayerMessage.COMMAND_MAINTENANCE_DISABLED);
         } else if (args[0].equalsIgnoreCase("bypass")) {
             new Thread(() -> {
                 if (args.length < 2) {
-                    sender.sendMessage("The correct usage is '/maintenance bypass <player name> true/false'.");
-                    return;
-                } else if (args.length < 3) {
+                    sender.sendMessage(PlayerMessage.COMMAND_MAINTENANCE_HELP);
+                } else if (args.length == 2) {
                     if (EasyVelocity.getMaintenanceManager().canPlayerBypass(EasyVelocity.getUUIDManager().playerNameToUUID(args[1]))) {
-                        sender.sendMessage(ChatColor.AQUA + args[1] + " can bypass maintenance.");
+                        sender.sendMessage(PlayerMessage.COMMAND_MAINTENANCE_CAN_BYPASS, args[1]);
                     } else {
-                        sender.sendMessage(ChatColor.AQUA + args[1] + " can't bypass maintenance.");
+                        sender.sendMessage(PlayerMessage.COMMAND_MAINTENANCE_CANNOT_BYPASS, args[1]);
                     }
-                    return;
-                }
-
-                if (args[2].equalsIgnoreCase("true")) {
-                    EasyVelocity.getMaintenanceManager().setPlayerBypass(EasyVelocity.getUUIDManager().playerNameToUUID(args[1]), true);
-                    sender.sendMessage(ChatColor.AQUA + args[1] + " can now bypass maintenance mode.");
-                } else if (args[2].equalsIgnoreCase("false")) {
-                    EasyVelocity.getMaintenanceManager().setPlayerBypass(EasyVelocity.getUUIDManager().playerNameToUUID(args[1]), false);
-                    sender.sendMessage(ChatColor.AQUA + args[1] + " can't bypass maintenance mode.");
                 } else {
-                    sendHelp(sender);
+                    if (args[2].equalsIgnoreCase("true")) {
+                        EasyVelocity.getMaintenanceManager().setPlayerBypass(EasyVelocity.getUUIDManager().playerNameToUUID(args[1]), true);
+                        sender.sendMessage(PlayerMessage.COMMAND_MAINTENANCE_CAN_BYPASS, args[1]);
+                    } else if (args[2].equalsIgnoreCase("false")) {
+                        EasyVelocity.getMaintenanceManager().setPlayerBypass(EasyVelocity.getUUIDManager().playerNameToUUID(args[1]), false);
+                        sender.sendMessage(PlayerMessage.COMMAND_MAINTENANCE_CANNOT_BYPASS, args[1]);
+                    } else {
+                        sendHelp(sender);
+                    }
                 }
             }).start();
         } else {
@@ -57,9 +56,8 @@ public class MaintenanceCommand extends EasyVelocityCommand {
     }
 
     private void sendHelp(EasyCommandSender sender) {
-        sender.sendMessage("Maintenance mode: " + EasyVelocity.getMaintenanceManager().isMaintenance() + ".");
-        sender.sendMessage("You may set maintenance mode using 'on' or 'off'.");
-        sender.sendMessage("Set maintenance bypasses with 'bypass <player name> true/false'.");
+        sender.sendMessage(PlayerMessage.COMMAND_MAINTENANCE_STATUS, EasyVelocity.getMaintenanceManager().isMaintenance() ? "enabled" : "disabled");
+        sender.sendMessage(PlayerMessage.COMMAND_MAINTENANCE_HELP);
     }
 
     @Override

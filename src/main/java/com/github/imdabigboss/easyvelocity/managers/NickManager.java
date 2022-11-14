@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.UUID;
 
 public class NickManager {
-    private Map<UUID, UUID> nickToPlayer = new HashMap<>();
-    private Map<UUID, UUID> playerToNick = new HashMap<>();
+    private final Map<UUID, UUID> nickToPlayer = new HashMap<>();
+    private final Map<UUID, UUID> playerToNick = new HashMap<>();
 
     public UUID getNick(UUID uuid) {
         return playerToNick.getOrDefault(uuid, null);

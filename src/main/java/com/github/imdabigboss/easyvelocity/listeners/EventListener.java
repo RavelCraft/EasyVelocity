@@ -4,10 +4,7 @@ import com.github.imdabigboss.easyvelocity.EasyVelocity;
 import com.github.imdabigboss.easyvelocity.info.PluginInfo;
 import com.github.imdabigboss.easyvelocity.info.ServerInfo;
 import com.github.imdabigboss.easyvelocity.managers.MaintenanceManager;
-import com.github.imdabigboss.easyvelocity.utils.ChatColor;
-import com.github.imdabigboss.easyvelocity.utils.ServerUtils;
-import com.github.imdabigboss.easyvelocity.utils.TexturePack;
-import com.github.imdabigboss.easyvelocity.utils.Utils;
+import com.github.imdabigboss.easyvelocity.utils.*;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.ResultedEvent;
@@ -80,22 +77,21 @@ public class EventListener {
     @Subscribe(order = PostOrder.FIRST)
     public void onPreLoginEvent(PreLoginEvent event) {
         String serverIP = ServerInfo.RAVELCRAFT_IP;
+
         Optional<InetSocketAddress> connect = event.getConnection().getVirtualHost();
         if (connect.isPresent()) {
             InetSocketAddress address = connect.get();
-            if (address.getHostString().equals(ServerInfo.RAVELCRAFT_IP)) {
+            if (address.getHostString().equals(ServerInfo.RAVELCRAFT_IP) || address.getHostString().equals("localhost")) {
                 serverIP = ServerInfo.RAVELCRAFT_IP;
             } else if (address.getHostString().equals(ServerInfo.LOULOU_IP)) {
                 loulouServer.add(event.getUsername());
                 serverIP = ServerInfo.LOULOU_IP;
-            } else if (address.getHostString().equals("localhost")) {
-                serverIP = ServerInfo.RAVELCRAFT_IP;
             } else {
-                serverIP = address.getHostString();
+                serverIP = null;
             }
         }
 
-        if (!serverIP.equals(ServerInfo.RAVELCRAFT_IP) && !serverIP.equals(ServerInfo.LOULOU_IP)) {
+        if (serverIP == null) {
             event.setResult(PreLoginEvent.PreLoginComponentResult.denied(Component.text("This server is private, if you think you should be able to join then you know how to contact the server owner.")));
         }
 
@@ -108,7 +104,7 @@ public class EventListener {
     public void onLoginEvent(LoginEvent event) {
         if (event.getPlayer().getUsername().startsWith("*")) {
             if (!this.verifiedCrackedUsers.contains(event.getPlayer().getUniqueId())) {
-                event.setResult(ResultedEvent.ComponentResult.denied(Component.text(ChatColor.RED + "Your login expired")));
+                event.setResult(ResultedEvent.ComponentResult.denied(PlayerMessage.formatMessage(PlayerMessage.LOGIN_EXPIRED, event.getPlayer())));
                 return;
             } else {
                 this.verifiedCrackedUsers.remove(event.getPlayer().getUniqueId());
@@ -125,7 +121,7 @@ public class EventListener {
             }
 
             if (!EasyVelocity.getWhitelistManager().isWhitelisted(event.getPlayer().getUniqueId())) {
-                event.setResult(ResultedEvent.ComponentResult.denied(Component.text(ChatColor.RED + "We are very sorry " + event.getPlayer().getUsername() + ", but you are not whitelisted on this server!")));
+                event.setResult(ResultedEvent.ComponentResult.denied(PlayerMessage.formatMessage(PlayerMessage.NOT_WHITELISTED, event.getPlayer())));
                 return;
             }
 
@@ -136,21 +132,17 @@ public class EventListener {
             }
         } else { //If the player is a nick
             EasyVelocity.getLogger().info("Player " + event.getPlayer().getUsername() + " has logged in as a nick from " + EasyVelocity.getUUIDManager().getPlayerName(originalPlayerUUID) + ".");
-            event.getPlayer().sendMessage(Component.text(ChatColor.RED + "You have logged in as a nick! Beware!"));
+            event.getPlayer().sendMessage(PlayerMessage.formatMessage(PlayerMessage.NICK_LOGIN, event.getPlayer()));
         }
 
         new Thread(() -> {
             EasyVelocity.getUUIDManager().registerUUID(event.getPlayer().getUniqueId(), event.getPlayer().getUsername());
 
             TexturePack.sendTexturePackToPlayer(event.getPlayer());
-
-            int out = Utils.getRandomNumberInRange(1, 4);
-            if (out == 1) {
-                event.getPlayer().sendMessage(Component.text(ChatColor.AQUA + "Hey there " + event.getPlayer().getUsername() + "! Did you read the rules??? Click this message to do so! " + PluginInfo.WEBSITE + "/rules").clickEvent(ClickEvent.openUrl(PluginInfo.WEBSITE + "/rules")));
-            }
         }).start();
 
-        ServerUtils.broadcast(ChatColor.YELLOW + event.getPlayer().getUsername() + " has joined the network!");
+        ServerUtils.broadcast(PlayerMessage.JOIN_NETWORK, event.getPlayer().getUsername());
+        event.getPlayer().sendMessage(PlayerMessage.formatMessage(PlayerMessage.JOIN_NETWORK, event.getPlayer(), event.getPlayer().getUsername()));
     }
 
     @Subscribe(order = PostOrder.FIRST)
@@ -173,7 +165,7 @@ public class EventListener {
 
             if (!serverName.equals(ServerInfo.LOBBY_SERVER_NAME) && !EasyVelocity.getWhitelistManager().isWhitelisted(player.getUniqueId(), serverName)) {
                 event.setResult(ServerPreConnectEvent.ServerResult.denied());
-                player.sendMessage(Component.text(ChatColor.RED + "We are very sorry " + playerName + ", but you are not whitelisted on this server!"));
+                player.sendMessage(PlayerMessage.formatMessage(PlayerMessage.NOT_WHITELISTED, event.getPlayer()));
             }
         });
     }
@@ -189,22 +181,30 @@ public class EventListener {
 
         EasyVelocity.getRanksManager().displayRank(player.getUniqueId());
         EasyVelocity.getCustomListManger().broadcastCustomList();
+
+        int out = Utils.getRandomNumberInRange(1, 4);
+        switch (out) {
+            case 1 -> player.sendMessage(PlayerMessage.formatMessage(PlayerMessage.RULES_WARNING, player, player.getUsername()).clickEvent(ClickEvent.openUrl(PluginInfo.WEBSITE + "/rules/")));
+            case 2 -> player.sendMessage(PlayerMessage.formatMessage(PlayerMessage.ANNOUNCEMENTS_WARNING, player, player.getUsername()).clickEvent(ClickEvent.openUrl(PluginInfo.WEBSITE + "/posts/")));
+        }
     }
 
     @Subscribe
     public void onDisconnectEvent(DisconnectEvent event) {
-        ServerUtils.broadcast(ChatColor.YELLOW + event.getPlayer().getUsername() + " has left the network!");
+        ServerUtils.broadcast(PlayerMessage.LEAVE_NETWORK, event.getPlayer().getUsername());
 
         EasyVelocity.getCustomListManger().broadcastCustomList();
     }
 
     @Subscribe(order = PostOrder.FIRST)
     public void onPlayerKickEvent(KickedFromServerEvent event) {
+        Player player = event.getPlayer();
+
         if (!event.getServer().getServerInfo().getName().equals(ServerInfo.LOBBY_SERVER_NAME)) {
             Optional<RegisteredServer> lobby = EasyVelocity.getServer().getServer(ServerInfo.LOBBY_SERVER_NAME);
             if (lobby.isPresent()) {
-                event.getPlayer().sendMessage(Component.text(ChatColor.RED + "You are now being redirected to the lobby."));
-                EasyVelocity.getLogger().info("Redirecting " + event.getPlayer().getUsername() + " to lobby, because of kick.");
+                player.sendMessage(PlayerMessage.formatMessage(PlayerMessage.LOBBY_REDIRECT, player));
+                EasyVelocity.getLogger().info("Redirecting " + player.getUsername() + " to lobby, because of kick.");
 
                 event.setResult(KickedFromServerEvent.RedirectPlayer.create(lobby.get()));
             }
@@ -244,7 +244,7 @@ public class EventListener {
                     .onlinePlayers(EasyVelocity.getServer().getPlayerCount())
                     .maximumPlayers(ServerInfo.MAX_PLAYERS)
                     .description(Component.text(ChatColor.AQUA + "TEST SERVER"))
-                    .version(new ServerPing.Version(event.getPing().getVersion().getProtocol(), ChatColor.RED + "Use versions 1.8.9 to 1.18.x+"))
+                    .version(new ServerPing.Version(event.getPing().getVersion().getProtocol(), ChatColor.RED + "Incorrect version!"))
                     .favicon(emptyFavicon)
                     .samplePlayers(samplePlayers);
 
@@ -260,9 +260,9 @@ public class EventListener {
             ServerPing.Builder serverPing = ServerPing.builder()
                     .onlinePlayers(0)
                     .maximumPlayers(0)
-                    .description(Component.text("Something went wrong, you may be unable to join the server..."))
+                    .description(Component.text("If you think you should be able to join, you know how to contact us!"))
                     .favicon(emptyFavicon)
-                    .version(new ServerPing.Version(0, ChatColor.RED + "You may be unable to connect"));
+                    .version(new ServerPing.Version(0, ChatColor.RED + "You can't join this server!"));
 
             event.setPing(serverPing.build());
             return;
@@ -273,26 +273,25 @@ public class EventListener {
                     .onlinePlayers(EasyVelocity.getServer().getPlayerCount())
                     .maximumPlayers(ServerInfo.MAX_PLAYERS)
                     .samplePlayers(samplePlayers)
-                    .version(new ServerPing.Version(0, ChatColor.RED + "You must be OP to join!"))
-                    .description(Component.text(ChatColor.AQUA + "The server is currently under maintenance..."));
+                    .version(new ServerPing.Version(0, ChatColor.RED + "You need permissions to join!"))
+                    .favicon(serverFavicon)
+                    .description(Component.text(ChatColor.AQUA + "The server is currently under maintenance...\nIf this message stays here for too long, please talk to an admin."));
 
             event.setPing(serverPing.build());
             return;
         }
 
         ServerPing.Builder serverPing = ServerPing.builder()
-                .version(new ServerPing.Version(event.getPing().getVersion().getProtocol(), ChatColor.RED + "Use versions 1.8.9 to 1.18.x+"))
+                .onlinePlayers(EasyVelocity.getServer().getPlayerCount())
+                .maximumPlayers(ServerInfo.MAX_PLAYERS)
+                .version(new ServerPing.Version(event.getPing().getVersion().getProtocol(), ChatColor.RED + "1.8.9 to 1.19.x+"))
                 .favicon(serverFavicon)
                 .samplePlayers(samplePlayers);
 
         if (isRavelCraft) {
-            serverPing.onlinePlayers(EasyVelocity.getServer().getPlayerCount())
-                    .maximumPlayers(ServerInfo.MAX_PLAYERS)
-                    .description(Component.text(ChatColor.GREEN + "Welcome to the " + ChatColor.RED + ServerInfo.SERVER_NAME + "\n" + ChatColor.YELLOW + EasyVelocity.getMotdMessage()));
+            serverPing.description(Component.text(ChatColor.GREEN + "Welcome to the " + ChatColor.RED + ServerInfo.SERVER_NAME + "\n" + ChatColor.YELLOW + EasyVelocity.getMotdMessage()));
         } else {
-            serverPing.onlinePlayers(EasyVelocity.getServer().getPlayerCount())
-                    .maximumPlayers(ServerInfo.MAX_LOULOU_PLAYERS)
-                    .description(Component.text(ChatColor.GREEN + ServerInfo.SERVER_NAME + ChatColor.RED + " Loulou server!\n" + ChatColor.YELLOW + EasyVelocity.getMotdMessage()));
+            serverPing.description(Component.text(ChatColor.GREEN + ServerInfo.SERVER_NAME + ChatColor.RED + " Loulou server!\n" + ChatColor.YELLOW + EasyVelocity.getMotdMessage()));
         }
 
         event.setPing(serverPing.build());

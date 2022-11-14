@@ -159,7 +159,7 @@ public class TexturePack {
     public static boolean sendTexturePackToPlayer(Player player) {
         if (EasyVelocity.isFloodgateAPI()) {
             if (FloodgateApi.getInstance().isFloodgateId(player.getUniqueId())) {
-                player.sendMessage(Component.text(ChatColor.YELLOW + "You are playing on Minecraft Bedrock edition. We are warning you that this server uses a texture pack that is not supported by Bedrock at this point."));
+                player.sendMessage(PlayerMessage.formatMessage(PlayerMessage.BEDROCK_TEXTUREPACK_WARNING, player));
                 return false;
             }
         }
