@@ -84,7 +84,7 @@ public class EasyVelocity {
 
     @Subscribe
     public void onShutdown(ProxyShutdownEvent event) {
-        pluginMessageManager.unregister();
+        pluginMessageManager.close();
     }
 
     // --- Util commands ---

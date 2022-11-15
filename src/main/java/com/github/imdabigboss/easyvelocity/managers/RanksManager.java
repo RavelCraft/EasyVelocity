@@ -59,9 +59,9 @@ public class RanksManager {
 
         if (allRanks.containsKey(rank)) {
             String color = allRanks.get(rank);
-            EasyVelocity.getPluginMessageManager().sendPlayerCommand(player, "setdisplayname", rank + ";" + color, "EasyCMD");
+            EasyVelocity.getPluginMessageManager().sendCommand(player, "setdisplayname", player.getUniqueId().toString(), rank, color, "EasyCMD");
         } else {
-            EasyVelocity.getPluginMessageManager().sendPlayerCommand(player, "setdisplayname", "none;" + ChatColor.RESET, "EasyCMD");
+            EasyVelocity.getPluginMessageManager().sendCommand(player, "setdisplayname", player.getUniqueId().toString(), "none", ChatColor.RESET + "", "EasyCMD");
         }
     }
 
