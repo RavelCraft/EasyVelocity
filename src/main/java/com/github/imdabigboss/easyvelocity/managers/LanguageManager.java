@@ -33,9 +33,14 @@ public class LanguageManager {
         this.config.save();
 
         EasyVelocity.getCustomListManger().broadcastCustomList(player);
+        this.sendPlayerLanguageToPlugin(player);
     }
 
     public PlayerMessage.MessageLanguage getPlayerLanguage(Player player) {
         return this.languages.getOrDefault(player.getUniqueId(), null);
+    }
+
+    public void sendPlayerLanguageToPlugin(Player player) {
+        EasyVelocity.getPluginMessageManager().sendCommand(player, "setplayerlanguage", player.getUniqueId().toString(), this.getPlayerLanguage(player).getCode());
     }
 }

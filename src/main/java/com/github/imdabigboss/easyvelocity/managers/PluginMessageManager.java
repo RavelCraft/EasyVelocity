@@ -82,18 +82,14 @@ public class PluginMessageManager {
 
             while (this.listening) {
                 String command = inputStream.readUTF();
+                int argumentCount = inputStream.readInt();
 
-                List<String> args = new ArrayList<>();
-                while (true) {
-                    String line = inputStream.readUTF();
-                    if (line.equals("\u0000")) {
-                        break;
-                    }
-
-                    args.add(line);
+                String[] arguments = new String[argumentCount];
+                for (int i = 0; i < argumentCount; i++) {
+                    arguments[i] = inputStream.readUTF();
                 }
 
-                this.runCommand(command, args.toArray(new String[0]));
+                this.runCommand(command, arguments);
             }
         } catch (NullPointerException ignored) {
         } catch (IOException e) {
@@ -120,7 +116,7 @@ public class PluginMessageManager {
     }
 
     private void runCommand(String command, String[] args) throws IOException {
-        //Nothing
+        //No commands received yet
     }
 
     public void sendCommand(Player player, String command, String... args) {
@@ -134,10 +130,10 @@ public class PluginMessageManager {
 
             DataOutputStream outputStream = socket.getOutputStream();
             outputStream.writeUTF(command);
+            outputStream.writeInt(args.length);
             for (String arg : args) {
                 outputStream.writeUTF(arg);
             }
-            outputStream.writeUTF("\u0000");
             outputStream.flush();
         } catch (NullPointerException e) {
             EasyVelocity.getLogger().warn("Unable to find server to send command to");

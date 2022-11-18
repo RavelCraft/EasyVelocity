@@ -179,8 +179,16 @@ public class EventListener {
             return;
         }
 
-        EasyVelocity.getRanksManager().displayRank(player.getUniqueId());
-        EasyVelocity.getCustomListManger().broadcastCustomList();
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ignored) {
+            }
+
+            EasyVelocity.getRanksManager().displayRank(player.getUniqueId());
+            EasyVelocity.getCustomListManger().broadcastCustomList();
+            EasyVelocity.getLanguageManager().sendPlayerLanguageToPlugin(player);
+        }).start();
 
         int out = Utils.getRandomNumberInRange(1, 4);
         switch (out) {

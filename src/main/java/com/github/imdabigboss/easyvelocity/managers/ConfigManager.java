@@ -52,6 +52,10 @@ public class ConfigManager {
     }
 
     public void reloadConfigs() {
+        for (PluginConfig config : configs.values()) {
+            config.reload();
+        }
+
         configs.clear();
 
         PluginConfig config = new PluginConfig(Paths.get("plugins/" + PluginInfo.NAME + "/config.yml"));
