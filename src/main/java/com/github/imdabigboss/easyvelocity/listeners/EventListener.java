@@ -195,6 +195,7 @@ public class EventListener {
             case 1 -> player.sendMessage(PlayerMessage.formatMessage(PlayerMessage.RULES_WARNING, player, player.getUsername()).clickEvent(ClickEvent.openUrl(PluginInfo.WEBSITE + "/rules/")));
             case 2 -> player.sendMessage(PlayerMessage.formatMessage(PlayerMessage.ANNOUNCEMENTS_WARNING, player, player.getUsername()).clickEvent(ClickEvent.openUrl(PluginInfo.WEBSITE + "/posts/")));
         }
+        player.sendMessage(Component.text("La traduction en Français du serveur est en cours de développement, essayez-la avec /language fr"));
     }
 
     @Subscribe
