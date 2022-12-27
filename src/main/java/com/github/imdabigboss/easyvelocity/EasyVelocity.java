@@ -38,6 +38,7 @@ public class EasyVelocity {
     private static NickManager nickManager = null;
     private static CrackedPlayerManager crackedPlayerManager = null;
     private static LanguageManager languageManager = null;
+    private static ServerManager serverManager = null;
 
     private static boolean floodgateAPI = false;
 
@@ -113,9 +114,11 @@ public class EasyVelocity {
         new CrackedCommand();
         new ConfigCommand();
         new LanguageCommand();
+        new ServerManageCommand();
     }
 
     private void loadManagers() {
+        serverManager = new ServerManager(); // Must be loaded first
         uuidManager = new UUIDManager();
         whitelistManager = new WhitelistManager();
         permissionsManager = new PermissionsManager();
@@ -201,6 +204,10 @@ public class EasyVelocity {
 
     public static LanguageManager getLanguageManager() {
         return languageManager;
+    }
+
+    public static ServerManager getServerManager() {
+        return serverManager;
     }
 
     public static boolean isFloodgateAPI() {

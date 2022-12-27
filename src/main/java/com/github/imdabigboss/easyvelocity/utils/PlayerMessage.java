@@ -67,12 +67,27 @@ public enum PlayerMessage {
     COMMAND_PACK_SENT(ChatColor.AQUA + "Pack sent!", ChatColor.AQUA + "Pack envoyé!"),
     COMMAND_PACK_SENT_ALL(ChatColor.AQUA + "Pack sent to all players!", ChatColor.AQUA + "Pack envoyé à tous les joueurs!"),
 
+    COMMAND_SERVER_ADDED(ChatColor.AQUA + "Server added!", ChatColor.AQUA + "Serveur ajouté!"),
+    COMMAND_SERVER_ADD_ERROR(ChatColor.RED + "An error occurred while adding the server...", ChatColor.RED + "Une erreur s'est produite lors de l'ajout du serveur..."),
+    COMMAND_SERVER_REMOVED(ChatColor.AQUA + "Server removed!", ChatColor.AQUA + "Serveur supprimé!"),
+    COMMAND_SERVER_REMOVE_ERROR(ChatColor.RED + "An error occurred while removing the server...", ChatColor.RED + "Une erreur s'est produite lors de la suppression du serveur..."),
+    COMMAND_SERVER_LIST(ChatColor.BOLD + "Servers:" + ChatColor.RESET + "%s", ChatColor.BOLD + "Serveurs : " + ChatColor.RESET + "%s"),
+    COMMAND_SERVER_HELP(ChatColor.RED + "Usage:\n" +
+            " - /servermanage add <name> <address> <port>\n" +
+            " - /servermanage remove <name>\n" +
+            " - /servermanage list",
+
+            ChatColor.RED + "Utilisation:\n" +
+            " - /servermanage add <nom> <address> <port>\n" +
+            " - /servermanage remove <nom>\n" +
+            " - /servermanage list"),
+
     COMMAND_TEMPBAN_NAN(ChatColor.RED + "Invalid time: %s. That is not a number. Go back to preschool.", ChatColor.RED + "Temps invalide: %s. Ce n'est pas un nombre. Retournez à la maternelle."),
     COMMAND_TEMPBAN_PLAYER_NOT_FOUND(ChatColor.RED + "That player doesn't exist. Let me go back to sleep.", ChatColor.RED + "Ce joueur n'existe pas. Laissez-moi retourner dormir."),
     COMMAND_TEMPBAN_BANNED(ChatColor.AQUA + "%s has been banned for %s days.", ChatColor.AQUA + "%s a été banni pour %s jours."),
     COMMAND_TEMPBAN_UNBANNED(ChatColor.AQUA + "%s has been unbanned.", ChatColor.AQUA + "%s a été débanni."),
     COMMAND_TEMPBAN_NOT_BANNED(ChatColor.RED + "%s is not banned.", ChatColor.RED + "%s n'est pas banni."),
-    COMMAND_TEMPBAN_LIST(ChatColor.BOLD + "Temporarily banned players:%s" + ChatColor.RESET, ChatColor.BOLD + "Joueurs bannis temporairement:%s" + ChatColor.RESET),
+    COMMAND_TEMPBAN_LIST(ChatColor.BOLD + "Temporarily banned players:" + ChatColor.RESET + "%s" + ChatColor.RESET, ChatColor.BOLD + "Joueurs bannis temporairement : " + ChatColor.RESET + "%s"),
     COMMAND_TEMPBAN_HELP(ChatColor.RED + "Usage:\n" +
             " - /tempban ban <player> <days> [reason]\n" +
             " - /tempban unban <player>\n" +
