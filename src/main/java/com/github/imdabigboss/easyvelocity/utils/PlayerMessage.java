@@ -67,12 +67,18 @@ public enum PlayerMessage {
     COMMAND_PACK_SENT(ChatColor.AQUA + "Pack sent!", ChatColor.AQUA + "Pack envoyé!"),
     COMMAND_PACK_SENT_ALL(ChatColor.AQUA + "Pack sent to all players!", ChatColor.AQUA + "Pack envoyé à tous les joueurs!"),
 
-    COMMAND_SERVER_ADDED(ChatColor.AQUA + "Server added!", ChatColor.AQUA + "Serveur ajouté!"),
-    COMMAND_SERVER_ADD_ERROR(ChatColor.RED + "An error occurred while adding the server...", ChatColor.RED + "Une erreur s'est produite lors de l'ajout du serveur..."),
-    COMMAND_SERVER_REMOVED(ChatColor.AQUA + "Server removed!", ChatColor.AQUA + "Serveur supprimé!"),
-    COMMAND_SERVER_REMOVE_ERROR(ChatColor.RED + "An error occurred while removing the server...", ChatColor.RED + "Une erreur s'est produite lors de la suppression du serveur..."),
-    COMMAND_SERVER_LIST(ChatColor.BOLD + "Servers:" + ChatColor.RESET + "%s", ChatColor.BOLD + "Serveurs : " + ChatColor.RESET + "%s"),
-    COMMAND_SERVER_HELP(ChatColor.RED + "Usage:\n" +
+    COMMAND_SEND_HELP(ChatColor.RED + "Usage: /send <player> <server>", ChatColor.RED + "Utilisation: /send <joueur> <serveur>"),
+    COMMAND_SEND_PLAYER_NOT_FOUND(ChatColor.RED + "Player not found!", ChatColor.RED + "Joueur introuvable!"),
+    COMMAND_SEND_SERVER_NOT_FOUND(ChatColor.RED + "Server not found!", ChatColor.RED + "Serveur introuvable!"),
+    COMMAND_SEND_ERROR(ChatColor.RED + "An error occurred while sending the player...", ChatColor.RED + "Une erreur s'est produite lors de l'envoi du joueur..."),
+    COMMAND_SEND_SUCCESS(ChatColor.AQUA + "Player sent!", ChatColor.AQUA + "Joueur envoyé!"),
+
+    COMMAND_SERVER_MANAGE_ADDED(ChatColor.AQUA + "Server added!", ChatColor.AQUA + "Serveur ajouté!"),
+    COMMAND_SERVER_MANAGE_ADD_ERROR(ChatColor.RED + "An error occurred while adding the server...", ChatColor.RED + "Une erreur s'est produite lors de l'ajout du serveur..."),
+    COMMAND_SERVER_MANAGE_REMOVED(ChatColor.AQUA + "Server removed!", ChatColor.AQUA + "Serveur supprimé!"),
+    COMMAND_SERVER_MANAGE_REMOVE_ERROR(ChatColor.RED + "An error occurred while removing the server...", ChatColor.RED + "Une erreur s'est produite lors de la suppression du serveur..."),
+    COMMAND_SERVER_MANAGE_LIST(ChatColor.BOLD + "Servers:" + ChatColor.RESET + "%s", ChatColor.BOLD + "Serveurs : " + ChatColor.RESET + "%s"),
+    COMMAND_SERVER_MANAGE_HELP(ChatColor.RED + "Usage:\n" +
             " - /servermanage add <name> <address> <port>\n" +
             " - /servermanage remove <name>\n" +
             " - /servermanage list",

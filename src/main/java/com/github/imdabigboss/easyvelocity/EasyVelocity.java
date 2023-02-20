@@ -115,6 +115,7 @@ public class EasyVelocity {
         new ConfigCommand();
         new LanguageCommand();
         new ServerManageCommand();
+        new SendCommand();
     }
 
     private void loadManagers() {

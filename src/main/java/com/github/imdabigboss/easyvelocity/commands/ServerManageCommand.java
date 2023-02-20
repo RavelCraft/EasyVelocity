@@ -34,7 +34,7 @@ public class ServerManageCommand extends EasyVelocityCommand {
             try {
                 port = Integer.parseInt(args[3]);
             } catch (NumberFormatException e) {
-                sender.sendMessage(PlayerMessage.COMMAND_SERVER_ADD_ERROR);
+                sender.sendMessage(PlayerMessage.COMMAND_SERVER_MANAGE_ADD_ERROR);
                 return;
             }
 
@@ -42,9 +42,9 @@ public class ServerManageCommand extends EasyVelocityCommand {
             ServerInfo serverInfo = new ServerInfo(name, socketAddress);
 
             if (EasyVelocity.getServerManager().addServer(serverInfo)) {
-                sender.sendMessage(PlayerMessage.COMMAND_SERVER_ADDED);
+                sender.sendMessage(PlayerMessage.COMMAND_SERVER_MANAGE_ADDED);
             } else {
-                sender.sendMessage(PlayerMessage.COMMAND_SERVER_ADD_ERROR);
+                sender.sendMessage(PlayerMessage.COMMAND_SERVER_MANAGE_ADD_ERROR);
             }
         } else if (args[0].equalsIgnoreCase("remove")) {
             if (args.length != 2) {
@@ -53,9 +53,9 @@ public class ServerManageCommand extends EasyVelocityCommand {
             }
 
             if (EasyVelocity.getServerManager().removeServer(args[1])) {
-                sender.sendMessage(PlayerMessage.COMMAND_SERVER_REMOVED);
+                sender.sendMessage(PlayerMessage.COMMAND_SERVER_MANAGE_REMOVED);
             } else {
-                sender.sendMessage(PlayerMessage.COMMAND_SERVER_REMOVE_ERROR);
+                sender.sendMessage(PlayerMessage.COMMAND_SERVER_MANAGE_REMOVE_ERROR);
             }
         } else if (args[0].equalsIgnoreCase("list")) {
             if (args.length != 1) {
@@ -68,14 +68,14 @@ public class ServerManageCommand extends EasyVelocityCommand {
                 sb.append("\n - ").append(server.getName()).append(" (").append(server.getAddress().getHostString()).append(":").append(server.getAddress().getPort()).append(")");
             }
 
-            sender.sendMessage(PlayerMessage.COMMAND_SERVER_LIST, sb.toString());
+            sender.sendMessage(PlayerMessage.COMMAND_SERVER_MANAGE_LIST, sb.toString());
         } else {
             this.sendHelp(sender);
         }
     }
 
     private void sendHelp(EasyCommandSender sender) {
-        sender.sendMessage(PlayerMessage.COMMAND_SERVER_HELP);
+        sender.sendMessage(PlayerMessage.COMMAND_SERVER_MANAGE_HELP);
     }
 
     @Override
